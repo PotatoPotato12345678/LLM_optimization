@@ -2,7 +2,7 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import {Home, Login, Dashboard, Manager} from "./components";
-import {AuthProvider, ProtectedRoute} from "./components/utils";
+import {AuthProvider} from "./components/utils";
 
 const App = () => {
   return (
@@ -12,10 +12,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard/employee" element={<Dashboard />} />
-              <Route path="/dashboard/manager" element={<Manager />} />
-            </Route>
+            <Route path="/dashboard/employee" element={<Dashboard />} />
+            <Route path="/dashboard/manager" element={<Manager />} />
           </Routes>
         </AuthProvider>
       </Router>

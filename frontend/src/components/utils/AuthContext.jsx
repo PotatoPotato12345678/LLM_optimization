@@ -1,14 +1,13 @@
-import { createContext, useContext, useState, useRef } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 
 const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
+  const userRef = useRef(null);
   const [user, setUser] = useState(null);
-  const userRef = useRef(user);
 
-  const getClientUsername= async () => {
+  const getClientUsername = async () => {
     try {
       const res = await fetch("http://localhost:8000/api/user/", {
         credentials: "include",
@@ -17,23 +16,23 @@ export const AuthProvider = ({ children }) => {
         const data = JSON.parse(await res.text());
         userRef.current = {
           username: data.username,
-          is_manager: data.is_manager
+          is_manager: data.is_manager,
         };
       } else {
         userRef.current = null;
       }
       setUser(userRef.current);
-      
-      return true;
+
+      return userRef.current;
     } catch (err) {
       console.error("Error fetching user info:", err);
-      return false;
+      return null;
     }
   };
 
   const login = async ({ username, password }) => {
     try {
-      const res = await fetch("http://localhost:8000/api/login/", {
+      const res = await fetch("http://localhost:8000/api/user/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -42,17 +41,18 @@ export const AuthProvider = ({ children }) => {
 
       if (!res.ok) {
         const data = await res.json();
-        navigate("/login");
         throw new Error(data.error || "Login failed");
       }
-      
-      await getClientUsername();
 
-      if (userRef.current.is_manager) {
+      const loggedInUser = await getClientUsername();
+
+      if (loggedInUser?.is_manager) {
+        console.log("Navigating to manager dashboard");
         navigate("/dashboard/manager");
       } else {
+        console.log("Navigating to employee dashboard");
         navigate("/dashboard/employee");
-      } 
+      }
       return true;
     } catch (err) {
       throw new Error(err.message);
@@ -60,11 +60,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    userRef.current = null;
-    setUser(userRef.current);
     try {
-      await fetch("http://localhost:8000/api/logout/", {
-        method: "POST",
+      await fetch("http://localhost:8000/api/user/", {
+        method: "DELETE",
         credentials: "include",
       }).then(async () => {
         navigate("/");
@@ -78,11 +76,13 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
+        user,
         userRef,
         getClientUsername,
         login,
         logout,
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

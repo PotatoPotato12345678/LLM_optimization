@@ -22,6 +22,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/user/", include("user.urls")),
     path("api/shift/", include("shift.urls")),
+    path("api/optimizedShift/", include("optimizedShift.urls")),
 ]
-
-from django.urls import path

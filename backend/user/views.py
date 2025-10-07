@@ -1,10 +1,13 @@
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.contrib.auth import authenticate, login, logout
 import json
 
+
+@method_decorator(csrf_exempt, name='dispatch')
 class User(View):
     """
     Employee and Manager manages their own authentication:
