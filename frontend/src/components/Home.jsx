@@ -1,6 +1,7 @@
 import react from "react";
 import { useAuth } from "./utils/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Paper } from "@mui/material";
 
 const Home = () => {
   const { userRef, login, logout } = useAuth();
@@ -10,6 +11,7 @@ const Home = () => {
     <div>
       <h1>Welcome to the Home Page</h1>
       <p>This is the main landing page of the application.</p>
+
       {userRef?.current ? (
         <>
           <p>

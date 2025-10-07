@@ -7,7 +7,7 @@ def create_default_users(apps, schema_editor):
     # Create 5 employees
     for i in range(1, 6):
         username = f"employee_{i}"
-        password = f"password_e_{i}"
+        password = f"e_{i}"
         if not User.objects.filter(username=username).exists():
             user = User(username=username, is_manager=False)
             user.password = make_password(password)
@@ -16,7 +16,7 @@ def create_default_users(apps, schema_editor):
     # Create 1 manager
     if not User.objects.filter(username="manager_1").exists():
         manager = User(username="manager_1", is_manager=True)
-        manager.password = make_password("password_m_1")
+        manager.password = make_password("m_1")
         manager.save()
 
     # Create superuser (admin)

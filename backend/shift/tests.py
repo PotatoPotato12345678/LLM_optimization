@@ -1,6 +1,9 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from .models import ShiftRequirement
+from django.test import TestCase, Client
+from django.contrib.auth import get_user_model
+from .models import ShiftRequirement
 from django.urls import reverse
 import json
 
@@ -83,4 +86,6 @@ class ShiftTests(TestCase):
         self.assertEqual(response.status_code, 200)
         # response.data is a list of dicts; compare contents
         returned = response.json()['data']
-        self.assertEqual([d['content'] for d in returned], ['Mon-Fri 9-5'])
+        self.assertEqual(returned, [{"employee": self.employee.username, "shift": "optimized shifts json is here"}])
+
+        

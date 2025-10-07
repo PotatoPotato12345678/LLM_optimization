@@ -1,14 +1,17 @@
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import View
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import ShiftRequirement
 from optimizedShift.models import OptimizedShift
-from backend.LLMoptimizer import shiftOptimizer
+from backend.LLM_optimizer import shiftOptimizer
 import json
 
 # Create your views here.
+@method_decorator(csrf_exempt, name='dispatch')
 class ShiftEmployee(LoginRequiredMixin,View):
     """
     Employee manages their shift requirements:
@@ -26,8 +29,17 @@ class ShiftEmployee(LoginRequiredMixin,View):
     def handle_no_permission(self):
         return JsonResponse({'error': 'Authentication required'}, status=401)
     
+    def employee_only(self, request):
+        """Return a JsonResponse if the user is not an employee, otherwise None."""
+        if request.user.is_manager:
+            return JsonResponse({'error': 'Only employees can access this endpoint'}, status=403)
+        return None
+    
 
     def get(self, request):
+        invalid_role = self.employee_only(request)
+        if invalid_role:
+            return invalid_role
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
@@ -42,6 +54,9 @@ class ShiftEmployee(LoginRequiredMixin,View):
 
     def post(self, request):
         # Accept year/month only from query parameters
+        invalid_role = self.employee_only(request)
+        if invalid_role:
+            return invalid_role
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
@@ -62,6 +77,9 @@ class ShiftEmployee(LoginRequiredMixin,View):
         return JsonResponse({"message": "Successfully created shift requirement"}, status=201)
 
     def put(self, request):
+        invalid_role = self.employee_only(request)
+        if invalid_role:
+            return invalid_role
         # Accept year/month only from query params
         year = request.GET.get('year')
         month = request.GET.get('month')
@@ -93,6 +111,9 @@ class ShiftEmployee(LoginRequiredMixin,View):
             return JsonResponse({"message": "Shift requirement created"}, status=201)
         
     def delete(self, request):
+        invalid_role = self.employee_only(request)
+        if invalid_role:
+            return invalid_role
         # Accept year/month only from query params
         year = request.GET.get('year')
         month = request.GET.get('month')
@@ -106,6 +127,7 @@ class ShiftEmployee(LoginRequiredMixin,View):
         shift_req.delete()
         return JsonResponse({"message": "Shift requirement deleted"}, status=204)
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ShiftManager(LoginRequiredMixin,View):
     """
     Manager manages their employees' shift requirements:
@@ -118,6 +140,12 @@ class ShiftManager(LoginRequiredMixin,View):
 
     def handle_no_permission(self):
         return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    def manager_only(self, request):
+        """Return a JsonResponse if the user is not a manager, otherwise None."""
+        if not request.user.is_manager:
+            return JsonResponse({'error': 'Only managers can access this endpoint'}, status=403)
+        return None
     
     def util_get_shift_reqs(self, year, month):
         shift_reqs = ShiftRequirement.objects.filter(year=year, month=month)
@@ -132,6 +160,9 @@ class ShiftManager(LoginRequiredMixin,View):
         return data
     
     def get(self, request):
+        invalid_role = self.manager_only(request)
+        if invalid_role:
+            return invalid_role
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
@@ -145,6 +176,9 @@ class ShiftManager(LoginRequiredMixin,View):
         return JsonResponse({"data": data})
 
     def post(self, request):
+        invalid_role = self.manager_only(request)
+        if invalid_role:
+            return invalid_role
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):

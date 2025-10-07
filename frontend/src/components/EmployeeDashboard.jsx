@@ -28,22 +28,6 @@ const Dashboard = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent page reload
     console.log("Submitted shift requirement:", editText);
-    fetch("http://localhost:8000/api/shift/employee", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: editText }),
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          console.error("Failed to submit shift requirement");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setShiftReq(editText);
-        setEditText("");
-      });
   };
 
   return (
