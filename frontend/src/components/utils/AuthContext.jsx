@@ -1,19 +1,23 @@
-import { createContext, useContext, useRef, useState } from "react";
+import { createContext, useContext, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
+
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const userRef = useRef(null);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // optional
 
+  // Fetch user info from server and populate state
   const getClientUsername = async () => {
     try {
       const res = await fetch("http://localhost:8000/api/user/", {
         credentials: "include",
       });
+
       if (res.ok) {
-        const data = JSON.parse(await res.text());
+        const data = await res.json();
         userRef.current = {
           username: data.username,
           is_manager: data.is_manager,
@@ -21,14 +25,23 @@ export const AuthProvider = ({ children }) => {
       } else {
         userRef.current = null;
       }
-      setUser(userRef.current);
 
+      setUser(userRef.current);
+      setLoading(false);
       return userRef.current;
     } catch (err) {
       console.error("Error fetching user info:", err);
+      userRef.current = null;
+      setUser(null);
+      setLoading(false);
       return null;
     }
   };
+
+  useEffect(() => {
+    // Fetch user on mount to persist login state
+    getClientUsername();
+  }, []);
 
   const login = async ({ username, password }) => {
     try {
@@ -47,12 +60,11 @@ export const AuthProvider = ({ children }) => {
       const loggedInUser = await getClientUsername();
 
       if (loggedInUser?.is_manager) {
-        console.log("Navigating to manager dashboard");
         navigate("/dashboard/manager");
       } else {
-        console.log("Navigating to employee dashboard");
         navigate("/dashboard/employee");
       }
+
       return true;
     } catch (err) {
       throw new Error(err.message);
@@ -64,11 +76,12 @@ export const AuthProvider = ({ children }) => {
       await fetch("http://localhost:8000/api/user/", {
         method: "DELETE",
         credentials: "include",
-      }).then(async () => {
-        navigate("/");
       });
-      await getClientUsername();
+      userRef.current = null;
+      setUser(null);
+      navigate("/");
     } catch (err) {
+      console.error(err);
       throw new Error(err.message);
     }
   };
@@ -81,6 +94,7 @@ export const AuthProvider = ({ children }) => {
         getClientUsername,
         login,
         logout,
+        loading, // optional
       }}
     >
       {children}

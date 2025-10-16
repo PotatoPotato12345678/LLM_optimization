@@ -1,4 +1,9 @@
 export { default as Home } from "./Home";
 export { default as Login } from "./Login";
+export { default as Logout } from "./Logout";
 export { default as Dashboard } from "./EmployeeDashboard";
+export { default as EmployeeInput } from "./EmployeeInput";
 export { default as Manager } from "./ManagerDashboard";
+export { default as ShiftManager } from "./ShiftManager";
+export { default as ShiftSetting } from "./ShiftSetting";
+export { default as Settings } from "./Settings";

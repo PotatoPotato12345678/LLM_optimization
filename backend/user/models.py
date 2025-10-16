@@ -18,3 +18,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+
+    # manager = models.ForeignKey(User, on_delete=models.CASCADE)
+    # workplace_name = models.CharField(max_length=255)
+    # num_shifts_per_day = models.IntegerField(default=2)
+    # working_days = models.JSONField(default=list)
+    # allow_weekend_work = models.BooleanField(default=False)
+    # max_consecutive_shifts = models.IntegerField(default=5)
+    # min_rest_hours = models.IntegerField(default=8)
+    # publish_auto = models.BooleanField(default=False)

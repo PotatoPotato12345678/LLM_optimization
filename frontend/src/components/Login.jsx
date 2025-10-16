@@ -6,8 +6,16 @@ import {
   Button,
   Paper,
   Divider,
+  Typography,
   useTheme,
 } from "@mui/material";
+
+const debugUsers = [
+  { label: "Admin", username: "admin", password: "admin" },
+  { label: "Manager", username: "manager_1", password: "m_1" },
+  { label: "Employee 1", username: "employee_1", password: "e_1" },
+  { label: "Employee 2", username: "employee_2", password: "e_2" },
+];
 
 const Login = () => {
   const { login } = useAuth();
@@ -26,6 +34,14 @@ const Login = () => {
     }
   };
 
+  const handleDebugLogin = async (username, password) => {
+    try {
+      await login({ username, password });
+    } catch (err) {
+      console.error("Debug login failed:", err.message);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -35,36 +51,34 @@ const Login = () => {
         minHeight: "100vh",
       }}
     >
-      <Paper elevation={3} sx={{ padding: 3, width: theme.spacing(50) }}>
-        <h1>Welcome to the Login Page</h1>
-        <p>Please enter your credentials to log in.</p>
-        <Paper
-          elevation={3}
-          style={{ display: "inline-block", width: "80%", padding: "10px" }}
-        >
-          <h3>Debug Employee</h3>
-          <table style={{ display: "inline-block" }}>
-            <tr>
-              <td>username:</td>
-              <td>
-                <strong>employee_1</strong>
-              </td>
-            </tr>
-            <tr>
-              <td>password:</td>
-              <td>
-                <strong>e_1</strong>
-              </td>
-            </tr>
-          </table>
-        </Paper>
-        <Box
-          component="form"
-          onSubmit={handleLogin}
-          noValidate
-          sx={{ mx: theme.spacing(8) }}
-        >
-          <Divider />
+      <Paper elevation={3} sx={{ padding: 3, width: theme.spacing(80) }}>
+        <Typography variant="h4" mb={1}>Welcome to the Login Page</Typography>
+        <Typography mb={2}>Please enter your credentials to log in.</Typography>
+
+        {/* Debug cards */}
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          {debugUsers.map((user) => (
+            <Paper
+              key={user.username}
+              elevation={3}
+              sx={{
+                p: 2,
+                flex: 1,
+                textAlign: "center",
+                cursor: "pointer",
+                ":hover": { backgroundColor: "#f0f0f0" },
+              }}
+              onClick={() => handleDebugLogin(user.username, user.password)}
+            >
+              <Typography variant="p">{user.label}</Typography>
+            </Paper>
+          ))}
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Regular login form */}
+        <Box component="form" onSubmit={handleLogin} noValidate>
           <TextField
             label="Username"
             fullWidth
@@ -100,4 +114,5 @@ const Login = () => {
     </Box>
   );
 };
+
 export default Login;

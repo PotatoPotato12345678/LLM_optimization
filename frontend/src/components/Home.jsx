@@ -11,6 +11,7 @@ const Home = () => {
     <div>
       <h1>Welcome to the Home Page</h1>
       <p>This is the main landing page of the application.</p>
+      <a href ="https://www.notion.so/Shift-Management-Optimization-27f7a62de23e8091822bd841bed2deeb"> Documentation Page</a>
 
       {userRef?.current ? (
         <>

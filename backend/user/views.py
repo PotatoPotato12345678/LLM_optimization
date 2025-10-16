@@ -51,3 +51,33 @@ class User(View):
             return JsonResponse({'message': 'Logout successful'}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+        
+
+@login_required
+@csrf_exempt  # or use proper CSRF token handling
+def updateProfile(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user = request.user
+
+            # Update fields (only if present)
+            if "username" in data:
+                user.username = data["username"]
+            if "email" in data:
+                user.email = data["email"]
+            if "first_name" in data:
+                user.first_name = data["first_name"]
+            if "last_name" in data:
+                user.last_name = data["last_name"]
+
+            user.save()
+            return JsonResponse({
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name
+            })
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Invalid method"}, status=405)

@@ -35,80 +35,105 @@ class ShiftEmployee(LoginRequiredMixin,View):
             return JsonResponse({'error': 'Only employees can access this endpoint'}, status=403)
         return None
     
-
     def get(self, request):
         invalid_role = self.employee_only(request)
         if invalid_role:
             return invalid_role
+
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
+
         try:
-            client_shift_req = get_object_or_404(ShiftRequirement, employee=request.user, year=year, month=month)
+            client_shift_req = get_object_or_404(
+                ShiftRequirement, employee=request.user, year=year, month=month
+            )
             return JsonResponse({
-                "content": client_shift_req.content
+                "content": client_shift_req.content,
+                "availability_calendar": client_shift_req.availability_calendar
             }, status=200)
         except Http404:
             return JsonResponse({"error": "Shift requirement not found"}, status=404)
 
+
     def post(self, request):
-        # Accept year/month only from query parameters
         invalid_role = self.employee_only(request)
         if invalid_role:
             return invalid_role
+
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
-        # Require JSON body
+
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
 
         content = data.get("content")
+        availability = data.get("availability_calendar", {})
 
         if content is None:
             return JsonResponse({'error': 'Content is required'}, status=400)
-        else:
-            ShiftRequirement.objects.create(content=content, employee=request.user, year=year, month=month)
+
+        ShiftRequirement.objects.create(
+            content=content,
+            availability_calendar=availability,
+            employee=request.user,
+            year=year,
+            month=month
+        )
 
         return JsonResponse({"message": "Successfully created shift requirement"}, status=201)
+
 
     def put(self, request):
         invalid_role = self.employee_only(request)
         if invalid_role:
             return invalid_role
-        # Accept year/month only from query params
+
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
-        # Require JSON body for PUT
+
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
 
         content = data.get("content")
-
-        if not content:
-            return JsonResponse({"error": "Content is required"}, status=400)
+        availability = data.get("availability_calendar")
 
         shift_req, created = ShiftRequirement.objects.get_or_create(
             employee=request.user,
             year=year,
             month=month,
-            defaults={"content": content}
+            defaults={
+                "content": content or "",
+                "availability_calendar": availability or {},
+            }
         )
 
         if not created:
-            shift_req.content = content
-            shift_req.save()
-            return JsonResponse({"message": "Shift requirement updated"}, status=200)
-        else:
-            return JsonResponse({"message": "Shift requirement created"}, status=201)
+            updated = False
+            if content is not None:
+                shift_req.content = content
+                updated = True
+            if availability is not None:
+                shift_req.availability_calendar = availability
+                updated = True
+
+            if updated:
+                shift_req.save()
+                return JsonResponse({"message": "Shift requirement updated"}, status=200)
+            else:
+                return JsonResponse({"message": "No changes provided"}, status=400)
+
+        return JsonResponse({"message": "Shift requirement created"}, status=201)
+
         
     def delete(self, request):
         invalid_role = self.employee_only(request)
@@ -163,17 +188,28 @@ class ShiftManager(LoginRequiredMixin,View):
         invalid_role = self.manager_only(request)
         if invalid_role:
             return invalid_role
+
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
 
-        try:
-            data = self.util_get_shift_reqs(year, month)
-        except Http404:
+        # Get all shift requirements for that month and year
+        shift_reqs = ShiftRequirement.objects.filter(year=year, month=month)
+
+        if not shift_reqs.exists():
             return JsonResponse({"error": "No shift requirements found"}, status=404)
 
-        return JsonResponse({"data": data})
+        # Build a dictionary with employee usernames as keys
+        result = {}
+        for req in shift_reqs:
+            result[req.employee.username] = {
+                "content": req.content,
+                "availability_calendar": req.availability_calendar,
+            }
+
+        return JsonResponse(result, status=200, safe=False)
+
 
     def post(self, request):
         invalid_role = self.manager_only(request)

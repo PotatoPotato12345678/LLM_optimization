@@ -1,16 +1,46 @@
-import react from 'react';
+import { useState, useEffect } from "react";
+import { useAuth } from "./utils/AuthContext";
+import { useNavigate } from "react-router-dom";
+import ShiftCalendar from "./utils/ShiftCalendar";
 
 const Manager = () => {
-    return (
-        <div>
-            <h1>Welcome to the Manager Page</h1>
-            <p>This is the manager page where manager can</p>
-            <ul>
-                <li>See their employee's shift requirements</li>
-                <li>Start optimization</li>
-                <li>Get optimization results</li>
-            </ul>
-        </div>
-    );
-}
+  const { userRef, logout } = useAuth();
+  const navigate = useNavigate();
+
+  return (
+    <div>
+      <h1>Welcome to the Dashboard</h1>
+      <p>This is the dashboard after login </p>
+      {userRef?.current ? (
+        <>
+          <section id="user-info">
+            <p>
+              Logged in as: <strong>{userRef.current.username}</strong>
+            </p>
+            <button
+              onClick={async () => {
+                await logout();
+                navigate("/login");
+              }}
+            >
+              Logout
+            </button>
+          </section>
+
+          <section id="dashboard-content">
+
+            <h2>Shift Calendar</h2>
+            <ShiftCalendar />
+          </section>
+        </>
+      ) : (
+        <>
+          <p>Please log in to access the dashboard.</p>
+          <button onClick={() => navigate("/login")}>Login</button>
+        </>
+      )}
+    </div>
+  );
+};
+
 export default Manager;

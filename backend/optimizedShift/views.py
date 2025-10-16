@@ -26,11 +26,11 @@ class Utils:
         return None
 
 @method_decorator(csrf_exempt, name='dispatch')
-class OptimizedShiftEmployee(LoginRequiredMixin,View):
+class OptimizedShiftEmployee(LoginRequiredMixin, View):
     """
     Employee
-    - GET: Retrieve the employee's assigned optimized shifts.
-    """ 
+    - GET: Retrieve the employee's assigned optimized shifts, including publish_status.
+    """
 
     def handle_no_permission(self):
         return JsonResponse({'error': 'Authentication required'}, status=401)
@@ -39,24 +39,29 @@ class OptimizedShiftEmployee(LoginRequiredMixin,View):
         invalid_role = Utils.employee_only(request)
         if invalid_role:
             return invalid_role
+
         year = request.GET.get('year')
         month = request.GET.get('month')
-        if not (year and month):    
+        if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
+
         if request.user.is_manager:
             return JsonResponse({'error': 'Only employees can access this endpoint'}, status=403)
-        else:
-            optimized_shift = Utils.util_get_optimized_shift(
-                year=request.GET.get('year'),
-                month=request.GET.get('month')
-            )
 
-            optimized_shift.shift = [s for s in optimized_shift.shift if s['employee'] == request.user.username]
-            return JsonResponse({"data": optimized_shift.shift}, status=200)
+        optimized_shift = Utils.util_get_optimized_shift(
+            year=int(year),
+            month=int(month)
+        )
+
+        return JsonResponse({
+            "data": optimized_shift.shift,
+            "publish_status": optimized_shift.publish_status
+        }, status=200)
+
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class OptimizedShiftManager(LoginRequiredMixin,View):
+class OptimizedShiftManager(LoginRequiredMixin, View):
     """
     Manager
     - GET: get the optimized shift schedule.
@@ -69,20 +74,24 @@ class OptimizedShiftManager(LoginRequiredMixin,View):
         invalid_role = Utils.manager_only(request)
         if invalid_role:
             return invalid_role
-        
+
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
-        
-        if request.user.is_manager:
-            optimized_shift = Utils.util_get_optimized_shift(
-                year=year,
-                month=month
-            )
-            return JsonResponse({"data": optimized_shift.shift}, status=200)
-        else:
-            return JsonResponse({'error': 'Only managers can access this endpoint'}, status=403)
+
+        if not request.user.is_manager:
+            return JsonResponse({'error': 'Only manager can access this endpoint'}, status=403)
+
+        optimized_shift = Utils.util_get_optimized_shift(
+            year=int(year),
+            month=int(month)
+        )
+
+        return JsonResponse({
+            "data": optimized_shift.shift,
+            "publish_status": optimized_shift.publish_status
+        }, status=200)
 
     def post(self, request):
         invalid_role = Utils.manager_only(request)

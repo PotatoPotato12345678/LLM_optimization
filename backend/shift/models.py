@@ -12,5 +12,7 @@ class ShiftRequirement(models.Model):
     employee = models.ForeignKey(User, on_delete=models.CASCADE)
     year = models.IntegerField(null=False, default=2025)
     month = models.PositiveSmallIntegerField(null=False, default=11)
+    availability_calendar = models.JSONField(default=dict)
+    
     def __str__(self):
         return f"{self.employee.username}: {self.year}-{self.month}"

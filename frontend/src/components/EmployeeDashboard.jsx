@@ -1,34 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "./utils/AuthContext";
 import { useNavigate } from "react-router-dom";
+import ShiftCalendar from "./utils/ShiftCalendar";
 
 const Dashboard = () => {
-  const [shiftReq, setShiftReq] = useState("");
-  const [editText, setEditText] = useState("");
   const { userRef, logout } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetch("http://localhost:8000/api/employee", {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          console.error("Failed to fetch shift requirements");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log(data);
-        setShiftReq(data);
-      });
-  }, []);
-
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent page reload
-    console.log("Submitted shift requirement:", editText);
-  };
 
   return (
     <div>
@@ -40,32 +17,20 @@ const Dashboard = () => {
             <p>
               Logged in as: <strong>{userRef.current.username}</strong>
             </p>
-            <button onClick={logout}>Logout</button>
+            <button
+              onClick={async () => {
+                await logout();
+                navigate("/login");
+              }}
+            >
+              Logout
+            </button>
           </section>
+
           <section id="dashboard-content">
-            <h2>Dashboard Content</h2>
-            <p>
-              This section contains the client's shift requirement information.
-            </p>
-            {shiftReq ? (
-              <pre>{JSON.stringify(shiftReq, null, 2)}</pre>
-            ) : (
-              <>
-                <form onSubmit={handleSubmit}>
-                  <p>Edit your shift requirement:</p>
-                  <textarea
-                    name="shiftRequirement"
-                    id="shiftRequirement"
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    rows={5}
-                    cols={50}
-                  />
-                  <br />
-                  <button type="submit">Submit</button>
-                </form>
-              </>
-            )}
+
+            <h2>Shift Calendar</h2>
+            <ShiftCalendar />
           </section>
         </>
       ) : (
@@ -77,4 +42,5 @@ const Dashboard = () => {
     </div>
   );
 };
+
 export default Dashboard;
