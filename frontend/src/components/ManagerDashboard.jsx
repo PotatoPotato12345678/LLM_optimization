@@ -10,23 +10,8 @@ const Manager = () => {
   return (
     <div>
       <h1>Welcome to the Dashboard</h1>
-      <p>This is the dashboard after login </p>
       {userRef?.current ? (
         <>
-          <section id="user-info">
-            <p>
-              Logged in as: <strong>{userRef.current.username}</strong>
-            </p>
-            <button
-              onClick={async () => {
-                await logout();
-                navigate("/login");
-              }}
-            >
-              Logout
-            </button>
-          </section>
-
           <section id="dashboard-content">
 
             <h2>Shift Calendar</h2>

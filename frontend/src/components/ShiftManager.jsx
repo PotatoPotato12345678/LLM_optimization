@@ -89,6 +89,9 @@ const ShiftManager = () => {
   return (
     <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
       <Paper sx={{ p: 2, width: "100%", maxWidth: 1000 }}>
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          <strong>Employee Shift Preference Viewer</strong>
+        </Typography>
         {/* Employee selector */}
         <Box sx={{ mb: 2 }}>
           {Object.keys(data).map((emp) => (
