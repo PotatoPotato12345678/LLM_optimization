@@ -6,9 +6,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import ShiftRequirement, ManagerRequirement
-from optimizedShift.models import OptimizedShift
-from backend.LLM_optimizer import shiftOptimizer
 import json
+
+from optimizer.parse_views import parseViews
 
 # Create your views here.
 @method_decorator(csrf_exempt, name='dispatch')
@@ -34,31 +34,30 @@ class ShiftEmployee(LoginRequiredMixin,View):
         if request.user.is_manager:
             return JsonResponse({'error': 'Only employees can access this endpoint'}, status=403)
         return None
+
+    @staticmethod
+    def get_for_manager(year, month):
+        shift_reqs = ShiftRequirement.objects.filter(year=year, month=month)
+        if not shift_reqs.exists():
+            return JsonResponse({"error": "No shift requirements found"}, status=404)
+
+        result = {}
+        for req in shift_reqs:
+            result[req.employee.username] = {
+                "content": req.content,
+                "availability_calendar": req.availability_calendar,
+            }
+        return JsonResponse(result, status=200, safe=False)
     
+
     def get(self, request):
-        """
-        Returns shift requirements differently depending on the requester:
-        - Employee: returns only their own shift requirement for the given month/year.
-        - Manager: returns all employees' shift requirements for the given month/year.
-        """
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
 
-        if request.user.is_manager:  # Assuming your User model has is_manager field
-            # Manager view: return all employees
-            shift_reqs = ShiftRequirement.objects.filter(year=year, month=month)
-            if not shift_reqs.exists():
-                return JsonResponse({"error": "No shift requirements found"}, status=404)
-
-            result = {}
-            for req in shift_reqs:
-                result[req.employee.username] = {
-                    "content": req.content,
-                    "availability_calendar": req.availability_calendar,
-                }
-            return JsonResponse(result, status=200, safe=False)
+        if request.user.is_manager:
+            return self.get_for_manager(year, month)
         else:
             # Employee view: return only their own
             try:
@@ -71,7 +70,6 @@ class ShiftEmployee(LoginRequiredMixin,View):
                 }, status=200)
             except ShiftRequirement.DoesNotExist:
                 return JsonResponse({"error": "Shift requirement not found"}, status=404)
-
 
 
     def post(self, request):
@@ -173,11 +171,13 @@ class ShiftEmployee(LoginRequiredMixin,View):
 class ShiftManager(LoginRequiredMixin,View):
     """
     Manager manages their employees' shift requirements:
-    - GET: gets their employees' shift requirements
+    - GET: gets the manager's hard rules and the preference 
     - POST: perform shift scheduling optimization and return the optimized shift schedule
+    - PUT: updates the working space rules
     Note:
         minimum functionality only
         handle_no_permission is overridden to return 401 when not logged in
+        RESTFUL structure is broken
     """
 
     def handle_no_permission(self):
@@ -188,18 +188,6 @@ class ShiftManager(LoginRequiredMixin,View):
         if not request.user.is_manager:
             return JsonResponse({'error': 'Only managers can access this endpoint'}, status=403)
         return None
-    
-    def util_get_shift_reqs(self, year, month):
-        shift_reqs = ShiftRequirement.objects.filter(year=year, month=month)
-
-        if not shift_reqs.exists():
-            raise Http404(f"No shift requirements found for year: {year}, month: {month}")
-
-        data = [
-            {"employee": s.employee.username, "content": s.content}
-            for s in shift_reqs
-        ]
-        return data
     
     def get(self, request):
         invalid_role = self.manager_only(request)
@@ -229,29 +217,14 @@ class ShiftManager(LoginRequiredMixin,View):
         month = request.GET.get("month")
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
+        
+        employee_data_dic = ShiftEmployee.get_for_manager(year, month)
+        if employee_data_dic.status_code != 200:
+            return employee_data_dic
 
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
-
-        hard_rule = data.get("hardRule", {})
-        content = data.get("content", "")
-
-        if not isinstance(hard_rule, dict):
-            return JsonResponse({"error": "hardRule must be a JSON object"}, status=400)
-
-        shift, created = ManagerRequirement.objects.get_or_create(
-            manager=request.user,
-            year=year,
-            month=month,
-            defaults={"hard_rule": hard_rule, "content": content}
-        )
-
-        if not created:
-            return JsonResponse({"error": "Shift for this month already exists"}, status=400)
-
-        return JsonResponse({"message": "Manager shift requirement created"}, status=201)
+        
+        assignment_matrix = parseViews(employee_data_dic)
+        return JsonResponse({"data": assignment_matrix}, status=200)
 
     def put(self, request):
         invalid_role = self.manager_only(request)
@@ -300,4 +273,3 @@ class ShiftManager(LoginRequiredMixin,View):
                 return JsonResponse({"message": "No changes provided"}, status=400)
 
         return JsonResponse({"message": "Manager shift requirement created"}, status=201)
-

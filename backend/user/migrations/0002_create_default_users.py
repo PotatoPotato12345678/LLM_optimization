@@ -4,18 +4,24 @@ from django.contrib.auth.hashers import make_password
 def create_default_users(apps, schema_editor):
     User = apps.get_model("user", "User")  # historical model
 
+    debugUsers = [
+        {"username": "レオ", "password": "e_1" },
+        {"username": "タム", "password": "e_2" },
+        {"username": "キム", "password": "e_3" },
+        {"username": "とうま", "password": "e_4" },
+    ]
     # Create 5 employees
-    for i in range(1, 6):
-        username = f"employee_{i}"
-        password = f"e_{i}"
+    for user in debugUsers:
+        username = user["username"]
+        password = user["password"]
         if not User.objects.filter(username=username).exists():
             user = User(username=username, is_manager=False)
             user.password = make_password(password)
             user.save()
 
     # Create 1 manager
-    if not User.objects.filter(username="manager_1").exists():
-        manager = User(username="manager_1", is_manager=True)
+    if not User.objects.filter(username="マネージャー").exists():
+        manager = User(username="マネージャー", is_manager=True)
         manager.password = make_password("m_1")
         manager.save()
 
@@ -29,7 +35,7 @@ def create_default_users(apps, schema_editor):
 def delete_default_users(apps, schema_editor):
     User = apps.get_model("user", "User")
     User.objects.filter(username__in=[
-        "employee_1", "employee_2", "employee_3", "employee_4", "employee_5", "manager_1", "admin"
+        "レオ", "タム", "キム", "とうま", "マネージャー", "admin"
     ]).delete()
 
 

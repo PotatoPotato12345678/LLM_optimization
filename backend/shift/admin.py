@@ -9,4 +9,4 @@ class ShiftRequirementAdmin(admin.ModelAdmin):
 @admin.register(ManagerRequirement)
 class ManagerRequirementAdmin(admin.ModelAdmin):
     list_display = ('hard_rule', 'content')
-    search_fields = ('content', 'manager_username')
+    search_fields = ('content', 'manager_username',)

@@ -11,11 +11,11 @@ import {
 } from "@mui/material";
 
 const debugUsers = [
-  { label: "マネージャー", username: "manager_1", password: "m_1" },
-  { label: "レオ", username: "Leo", password: "e_1" },
-  { label: "タム", username: "Tam", password: "e_2" },
-  { label: "キム", username: "Kim", password: "e_3" },
-  { label: "とうま", username: "Toma", password: "e_4" },
+  { username: "マネージャー", password: "m_1" },
+  { username: "レオ", password: "e_1" },
+  { username: "タム", password: "e_2" },
+  { username: "キム", password: "e_3" },
+  { username: "とうま", password: "e_4" },
 ];
 
 const Login = () => {
@@ -53,7 +53,9 @@ const Login = () => {
       }}
     >
       <Paper elevation={3} sx={{ padding: 3, width: theme.spacing(100) }}>
-        <Typography variant="h4" mb={1}>Welcome to the Login Page</Typography>
+        <Typography variant="h4" mb={1}>
+          Welcome to the Login Page
+        </Typography>
         <Typography mb={2}>Please enter your credentials to log in.</Typography>
 
         {/* Debug cards */}
@@ -71,7 +73,7 @@ const Login = () => {
               }}
               onClick={() => handleDebugLogin(user.username, user.password)}
             >
-              <Typography variant="p">{user.label}</Typography>
+              <Typography variant="p">{user.username}</Typography>
             </Paper>
           ))}
         </Box>

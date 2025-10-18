@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 
-def extract_A():
-    df_av = pd.read_json("mats/availability_mat_new.json")       # substitute this with actual logic
+def extract_A(data):
+    # df_av = pd.read_json("mats/availability_mat_new.json")
+    df_av = pd.read_json(data)
     df_av.drop("content", inplace=True)
     records = []
 
@@ -39,8 +40,9 @@ def extract_A():
 
     return M_A
 
-def extract_ED():
-    df_wi_mult = pd.read_json("mats/willingness_mat_new.json")  # substitute this with actual logic
+def extract_ED(data):
+    # df_wi_mult = pd.read_json("mats/willingness_mat_new.json")  # substitute this with actual logic
+    df_wi_mult = pd.read_json(data)
     rows = []
     records = []
 
@@ -60,8 +62,9 @@ def extract_ED():
 
     return M_LLM_ED
 
-def extract_EE():
-    df_ee = pd.read_json("mats/ee_mat.json")     # substitute with actual logic
+def extract_EE(data):
+    df_ee = pd.read_json(data)
+    # df_ee = pd.read_json("mats/ee_mat.json")     # substitute with actual logic
     M_LLM_EE = []
 
     for row_name, row in df_ee.iterrows():
@@ -69,8 +72,3 @@ def extract_EE():
             M_LLM_EE.append([row_name.upper(), col_name.upper(), float(value)])
     
     return M_LLM_EE
-
-if __name__ == "__main__":
-    M = extract_EE()
-    for rows in M:
-        print(rows)

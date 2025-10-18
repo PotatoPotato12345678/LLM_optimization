@@ -23,4 +23,6 @@ urlpatterns = [
     path("api/user/", include("user.urls")),
     path("api/shift/", include("shift.urls")),
     path("api/optimizedShift/", include("optimizedShift.urls")),
+    path("api/llmModule/", include("llmModule.urls")),
+    path("api/optimizer/", include("optimizer.urls")),
 ]

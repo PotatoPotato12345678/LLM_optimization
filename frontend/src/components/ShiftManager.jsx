@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Typography, TextField, Paper } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  TextField,
+  Paper,
+  Modal,
+  ChildModal,
+  CircularProgress,
+} from "@mui/material";
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -30,7 +39,7 @@ const ShiftManager = () => {
       const year = nextMonthYear;
       const month = nextMonth + 1;
       const res = await fetch(
-        `http://localhost:8000/api/shift/employee/?year=${year}&month=${month}`,
+        `http://localhost:8000/api/shift/manager/?year=${year}&month=${month}`,
         { credentials: "include" }
       );
 
@@ -79,19 +88,107 @@ const ShiftManager = () => {
     }
   }, [selectedEmployee, data, dates]);
 
-  const monthName = new Date(nextMonthYear, nextMonth).toLocaleString("default", {
-    month: "long",
-  });
+  const monthName = new Date(nextMonthYear, nextMonth).toLocaleString(
+    "default",
+    {
+      month: "long",
+    }
+  );
   const yearName = nextMonthYear;
   const firstDayWeekday = new Date(nextMonthYear, nextMonth, 1).getDay();
   const emptySlots = Array.from({ length: firstDayWeekday }, (_, i) => i);
 
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    pt: 2,
+    px: 4,
+    pb: 3,
+  };
+
+  const [loading, setLoading] = useState(false);
+  const startOptimizationProcess = async () => {
+    const year = nextMonthYear;
+    const month = nextMonth + 1;
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/shift/manager/?year=${year}&month=${month}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Login failed");
+      }
+    } catch (err) {
+      console.error("Error starting optimization:", err);
+    } finally {
+      setLoading(false);
+      handleClose();
+    }
+  };
+
   return (
     <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
+      <Modal
+        open={loading}
+        aria-labelledby="loading-modal"
+        aria-describedby="optimization-in-progress"
+      >
+        <Box
+          sx={{
+            ...style,
+          }}
+        >
+          <CircularProgress />
+          <Typography>Processing your optimization...</Typography>
+        </Box>
+      </Modal>
       <Paper sx={{ p: 2, width: "100%", maxWidth: 1000 }}>
         <Typography variant="h4" sx={{ mb: 2 }}>
           <strong>従業員シフト表提出</strong>
         </Typography>
+
+        <Button
+          sx={{ mb: 5 }}
+          variant={"contained"}
+          color={"success"}
+          onClick={handleOpen}
+        >
+          シフトを作成する
+        </Button>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="parent-modal-title"
+          aria-describedby="parent-modal-description"
+        >
+          <Box sx={{ ...style, width: 500 }}>
+            <h2 id="parent-modal-title" sx={{ textAlign: "center" }}>
+              シフト生成を開始してもよろしいでしょうか？
+            </h2>
+            <Box
+              sx={{ mt: 2, display: "flex", justifyContent: "space-around" }}
+            >
+              <Button onClick={handleClose}>戻る</Button>
+              <Button onClick={startOptimizationProcess}>開始する</Button>
+            </Box>
+          </Box>
+        </Modal>
+
         {/* Employee selector */}
         <Box sx={{ mb: 2 }}>
           {Object.keys(data).map((emp) => (
@@ -108,85 +205,97 @@ const ShiftManager = () => {
 
         {/* Employee content */}
         <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>
             希望欄
-            </Typography>
-            <TextField
+          </Typography>
+          <TextField
             label="Content"
             multiline
             minRows={4}
             maxRows={8}
             fullWidth
             value={content}
-            sx={{ width: "100%", maxWidth: 1000  }}
-            />
+            sx={{ width: "100%", maxWidth: 1000 }}
+          />
         </Box>
-        
-        <Paper sx={{ p: 2, width: "96%", height: "77%", maxWidth: 1000, overflowX: "visible", position: "relative" }}>
 
-            <Typography variant="h5" sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            p: 2,
+            width: "96%",
+            height: "77%",
+            maxWidth: 1000,
+            overflowX: "visible",
+            position: "relative",
+          }}
+        >
+          <Typography variant="h5" sx={{ mb: 2 }}>
             {monthName} - {yearName}
-            </Typography>
+          </Typography>
 
-            {/* Weekday header */}
-            <Box
+          {/* Weekday header */}
+          <Box
             sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(7, 1fr)",
-                mb: 1,
-                backgroundColor: "#4a4949ff",
-                borderRadius: 1,
-                p: 1,
+              display: "grid",
+              gridTemplateColumns: "repeat(7, 1fr)",
+              mb: 1,
+              backgroundColor: "#4a4949ff",
+              borderRadius: 1,
+              p: 1,
             }}
-            >
+          >
             {weekDays.map((day) => (
-                <Typography
+              <Typography
                 key={day}
                 sx={{ textAlign: "center", fontWeight: "bold", color: "#fff" }}
-                >
+              >
                 {day}
-                </Typography>
+              </Typography>
             ))}
-            </Box>
+          </Box>
 
-            {/* Calendar grid */}
-            <Box
+          {/* Calendar grid */}
+          <Box
             sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(7, 1fr)",
-                gap: 2,
+              display: "grid",
+              gridTemplateColumns: "repeat(7, 1fr)",
+              gap: 2,
             }}
-            >
+          >
             {emptySlots.map((i) => (
-                <Box key={`empty-${i}`} />
+              <Box key={`empty-${i}`} />
             ))}
 
             {dates.map((date) => {
-                const key = date.toISOString().slice(0, 10);
-                return (
+              const key = date.toISOString().slice(0, 10);
+              return (
                 <Paper key={key} sx={{ p: 1, textAlign: "center" }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
                     {date.getDate()}
-                    </Typography>
-                    <Button
+                  </Typography>
+                  <Button
                     variant="contained"
-                    color={availability[key]?.morning === "O" ? "success" : "error"}
+                    color={
+                      availability[key]?.morning === "O" ? "success" : "error"
+                    }
                     sx={{ width: "100%", mb: 0.5 }}
-                    >
+                  >
                     {availability[key]?.morning || "-"}
-                    </Button>
-                    <Button
+                  </Button>
+                  <Button
                     variant="contained"
-                    color={availability[key]?.evening === "O" ? "success" : "error"}
+                    color={
+                      availability[key]?.evening === "O" ? "success" : "error"
+                    }
                     sx={{ width: "100%" }}
-                    >
+                  >
                     {availability[key]?.evening || "-"}
-                    </Button>
+                  </Button>
                 </Paper>
-                );
+              );
             })}
-            </Box>
-        </Paper>
+          </Box>
+        </Box>
       </Paper>
     </Box>
   );

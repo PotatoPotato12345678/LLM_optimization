@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "user",
     "shift",
     "optimizedShift",
+    "llmModule",
 ]
 
 MIDDLEWARE = [
