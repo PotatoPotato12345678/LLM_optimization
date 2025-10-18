@@ -1,0 +1,38 @@
+{
+  "Alice": {
+    "availability_calendar": {
+      "2025-11-01": { "morning": "O", "evening": "X" },
+      "2025-11-02": { "morning": "O", "evening": "O" },
+      "2025-11-03": { "morning": "X", "evening": "O" },
+      "2025-11-04": { "morning": "O", "evening": "O" },
+      "2025-11-05": { "morning": "X", "evening": "X" },
+      "2025-11-06": { "morning": "O", "evening": "O" },
+      "2025-11-07": { "morning": "X", "evening": "O" }
+    },
+    "content": "Alice prefers working morning shifts on weekdays and evenings on weekends."
+  },
+  "Bob": {
+    "availability_calendar": {
+      "2025-11-01": { "morning": "X", "evening": "O" },
+      "2025-11-02": { "morning": "X", "evening": "O" },
+      "2025-11-03": { "morning": "O", "evening": "X" },
+      "2025-11-04": { "morning": "O", "evening": "O" },
+      "2025-11-05": { "morning": "O", "evening": "X" },
+      "2025-11-06": { "morning": "O", "evening": "O" },
+      "2025-11-07": { "morning": "O", "evening": "X" }
+    },
+    "content": "Bob prefers even-numbered dates and cannot work Sunday mornings."
+  },
+  "Carol": {
+    "availability_calendar": {
+      "2025-11-01": { "morning": "X", "evening": "X" },
+      "2025-11-02": { "morning": "O", "evening": "O" },
+      "2025-11-03": { "morning": "X", "evening": "O" },
+      "2025-11-04": { "morning": "O", "evening": "O" },
+      "2025-11-05": { "morning": "O", "evening": "X" },
+      "2025-11-06": { "morning": "O", "evening": "O" },
+      "2025-11-07": { "morning": "O", "evening": "O" }
+    },
+    "content": "Carol prefers evening shifts but can fill in mornings if needed."
+  }
+}
