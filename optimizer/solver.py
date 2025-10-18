@@ -3,7 +3,7 @@ from model_def import model as m
 import json
 
 # define solver
-solver = "appsi_highs"
+solver = "ipopt"
 SOLVER = pyo.SolverFactory(solver)
 
 assert SOLVER.available(), f"Solver {solver} is not available."

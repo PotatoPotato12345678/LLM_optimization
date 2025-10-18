@@ -93,30 +93,33 @@ def ED_DotProduct_Per_Employee_Rule(m, e):
 
 model.ED_DotProduct_Per_Employee = Expression(model.E, rule=ED_DotProduct_Per_Employee_Rule)
 
-def ED_L2Norm_Employee_Rule(m):
-    return sum(# Summing for all E
-        sqrt(sum(m.A[e, d, s]**2 for s in model.S for d in model.D))            # A
-        * sqrt(sum(m.M_LLM_ED[e, d, s]**2 for s in model.S for d in model.D))   # M_LLM_ED
-        for e in model.E
-    )
-model.ED_Employee_demoninator = Expression(rule=ED_L2Norm_Employee_Rule)
+def ED_L2Norm_Employee_Rule(m, e):
+    return sqrt(sum(m.A[e, d, s]**2 for d in m.D for s in m.S)) * \
+           sqrt(sum(m.M_LLM_ED[e, d, s]**2 for d in m.D for s in m.S))
+model.ED_Employee_denominator = Expression(model.E, rule=ED_L2Norm_Employee_Rule)
 
-def ED_Employee_CosSim_Rule(m):
-    return m.ED_DotProduct_Per_Employee / m.ED_Employee_demoninator
-model.ED_Employee_diff = Expression(rule=ED_Employee_CosSim_Rule)
+def ED_Employee_CosSim_Rule(m, e):
+    return m.ED_DotProduct_Per_Employee[e] / m.ED_Employee_denominator[e]
+model.ED_Employee_diff = Expression(model.E, rule=ED_Employee_CosSim_Rule)
 
 # Whole matrix difference
 def ED_DotProduct_Rule(m):
-    return sum_product(m.A, m.M_LLM_ED)
+    return sum(
+        m.A[e, d, s] * m.M_LLM_ED[e, d, s]
+        for e in m.E for d in m.D for s in m.S
+    )
 model.ED_DotProduct = Expression(rule=ED_DotProduct_Rule)
 
 def L2Norm_A_Rule(m):
-    sum_of_square = summation(m.A**2, index=m.E * m.D * m.S)
+    sum_of_square = sum(m.A[e, d, s]**2 for e in m.E for d in m.D for s in m.S)
     return sqrt(sum_of_square)
 model.L2Norm_A = Expression(rule=L2Norm_A_Rule)
 
 def L2Norm_M_LLM_ED_Rule(m):
-    sum_of_square = summation(m.M_LLM_ED**2, index=m.E * m.D * m.S)
+    sum_of_square = sum(
+        (m.M_LLM_ED[e, d, s])**2
+        for e in m.E for d in m.D for s in m.S
+    )
     return sqrt(sum_of_square)
 model.L2Norm_M_LLM_ED = Expression(rule=L2Norm_M_LLM_ED_Rule)
 
@@ -125,13 +128,16 @@ def ED_CosSim_Rule(m):
 model.ED_diff = Expression(rule=ED_CosSim_Rule)
 
 def ED_Loss_Rule(m):
-    return m.ED_Element_diff + m.ED_Employee_diff + m.ED_diff
+    return m.ED_Element_diff + sum(m.ED_Employee_diff[e] for e in m.E) + + m.ED_diff
 model.ED_Loss = Expression(rule=ED_Loss_Rule)
 
 # EE Matrix
 # Element-wise difference
 def EE_Element_Rule(m):
-    return (1 / (len(m.E) * len(m.E))) * summation(m.M_sugg_EE - m.M_LLM_EE, index=m.E * m.E)
+    return (1 / (len(m.E) * len(m.E))) * sum(
+        (m.M_sugg_EE[e, e_] - m.M_LLM_EE[e, e_])
+        for e in m.E for e_ in m.E
+    )
 model.EE_Element_diff = Expression(rule=EE_Element_Rule)
 
 # Employee-wise difference
@@ -142,30 +148,36 @@ def EE_DotProduct_Per_Employee_Rule(m):
     )
 model.EE_DotProduct_Per_Employee = Expression(rule=EE_DotProduct_Per_Employee_Rule)
 
-def EE_L2Norm_Employee_Rule(m):
-    return sum(
-        sqrt(sum(m.M_sugg_EE[e, e_]**2 for e_ in model.E))            # M_sugg_EE
-        * sqrt(sum(m.M_LLM_EE[e, e_]**2 for e_ in model.E))           # M_LLM_EE
-        for e in model.E
-    )
-model.EE_Employee_demoninator = Expression(rule=EE_L2Norm_Employee_Rule)
+def EE_L2Norm_Employee_Rule(m, e):
+    return sqrt(sum(m.M_sugg_EE[e, e_]**2 for e_ in m.E)) * \
+           sqrt(sum(m.M_LLM_EE[e, e_]**2 for e_ in m.E))
+model.EE_Employee_denominator = Expression(model.E, rule=EE_L2Norm_Employee_Rule)
 
-def EE_Employee_CosSim_Rule(m):
-    return m.EE_DotProduct_Per_Employee / m.EE_Employee_demoninator
-model.EE_Employee_diff = Expression(rule=EE_Employee_CosSim_Rule)
+def EE_Employee_CosSim_Rule(m, e):
+    return m.EE_DotProduct_Per_Employee / m.EE_Employee_denominator[e]
+model.EE_Employee_diff = Expression(model.E, rule=EE_Employee_CosSim_Rule)
 
 # Whole matrix difference
 def EE_DotProduct_Rule(m):
-    return sum_product(m.M_sugg_EE, m.M_LLM_EE)
+    return sum(
+        m.M_sugg_EE[e, e_] * m.M_LLM_EE[e, e_]
+        for e in m.E for e_ in m.E
+    )
 model.EE_DotProduct = Expression(rule=EE_DotProduct_Rule)
 
 def L2Norm_M_sugg_EE_Rule(m):
-    sum_of_square = summation(m.M_sugg_EE**2, index=m.E * m.E)
+    sum_of_square = sum(
+        m.M_sugg_EE[e, e_]**2
+        for e in m.E for e_ in m.E
+    )
     return sqrt(sum_of_square)
 model.L2Norm_M_sugg_EE = Expression(rule=L2Norm_M_sugg_EE_Rule)
 
 def L2Norm_M_LLM_EE_Rule(m):
-    sum_of_square = summation(m.M_LLM_EE**2, index=m.E * m.E)
+    sum_of_square = sum(
+        (m.M_LLM_EE[e, e_])**2
+        for e in m.E for e_ in m.E
+    )
     return sqrt(sum_of_square)
 model.L2Norm_M_LLM_EE = Expression(rule=L2Norm_M_LLM_EE_Rule)
 
@@ -174,7 +186,7 @@ def EE_CosSim_Rule(m):
 model.EE_diff = Expression(rule=EE_CosSim_Rule)
 
 def EE_Loss_Rule(m):
-    return m.EE_Element_diff + m.EE_Employee_diff + m.EE_diff
+    return m.EE_Element_diff + sum(m.EE_Employee_diff[e] for e in m.E) + m.EE_diff
 model.EE_Loss = Expression(rule=EE_Loss_Rule)
 
 # Objective function
