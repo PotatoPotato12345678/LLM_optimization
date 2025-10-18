@@ -4,7 +4,7 @@ def gen_availability():
     pass
 
 def gen_willingness():
-    df_will = pd.read_json('mats/willingness_mat.json')   # substitute this with actual logic
+    df_will = pd.read_json("../mats/willingness_mat.json")   # substitute this with actual logic
 
     rows = []
     for day, row in df_will.iterrows():
@@ -30,4 +30,4 @@ def gen_willingness():
 if __name__ == "__main__":
     M_LLM_willingness = gen_willingness()
     for row in M_LLM_willingness:
-        print(rows)
+        print(row)
