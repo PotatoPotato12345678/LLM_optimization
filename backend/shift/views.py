@@ -206,34 +206,27 @@ class ShiftManager(LoginRequiredMixin,View):
         if invalid_role:
             return invalid_role
 
-        year = request.GET.get('year')
-        month = request.GET.get('month')
+        year = request.GET.get("year")
+        month = request.GET.get("month")
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
 
-        # Try to get the manager requirement for this month
-        manager_req = ManagerRequirement.objects.filter(
-            manager=request.user, year=year, month=month
-        ).first()
-
-        if not manager_req:
-            return JsonResponse({"error": "Manager requirement not found"}, status=404)
-
-        return JsonResponse(
-            {
-                "hard_rule": manager_req.hard_rule,
-                "content": manager_req.content,
-            },
-            status=200,
-        )
+        try:
+            shift = ManagerRequirement.objects.get(manager=request.user, year=year, month=month)
+            return JsonResponse({
+                "hard_rule": shift.hard_rule,
+                "content": shift.content
+            }, status=200)
+        except ManagerRequirement.DoesNotExist:
+            return JsonResponse({"hard_rule": {}, "content": ""}, status=200)
 
     def post(self, request):
         invalid_role = self.manager_only(request)
         if invalid_role:
             return invalid_role
 
-        year = request.GET.get('year')
-        month = request.GET.get('month')
+        year = request.GET.get("year")
+        month = request.GET.get("month")
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
 
@@ -242,64 +235,69 @@ class ShiftManager(LoginRequiredMixin,View):
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-        content = data.get("content")
-        hard_rule = data.get("hardRule")
+        hard_rule = data.get("hardRule", {})
+        content = data.get("content", "")
 
-        if content is None or hard_rule is None:
-            return JsonResponse({'error': 'Both content and hardRule are required'}, status=400)
+        if not isinstance(hard_rule, dict):
+            return JsonResponse({"error": "hardRule must be a JSON object"}, status=400)
 
-        ManagerRequirement.objects.create(
-            content=content,
-            hard_rule=hard_rule,
+        shift, created = ManagerRequirement.objects.get_or_create(
+            manager=request.user,
             year=year,
             month=month,
-            manager=request.user
+            defaults={"hard_rule": hard_rule, "content": content}
         )
 
-        return JsonResponse({"message": "Manager shift requirement created"}, status=201)
+        if not created:
+            return JsonResponse({"error": "Shift for this month already exists"}, status=400)
 
+        return JsonResponse({"message": "Manager shift requirement created"}, status=201)
 
     def put(self, request):
         invalid_role = self.manager_only(request)
         if invalid_role:
             return invalid_role
 
-        year = request.GET.get('year')
-        month = request.GET.get('month')
+        year = request.GET.get("year")
+        month = request.GET.get("month")
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
+
+        year = int(year)
+        month = int(month)
 
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-        content = data.get("content")
         hard_rule = data.get("hardRule")
+        content = data.get("content")
 
-        manager_req, created = ManagerRequirement.objects.get_or_create(
+        if hard_rule is not None and not isinstance(hard_rule, dict):
+            return JsonResponse({"error": "hardRule must be a JSON object"}, status=400)
+
+        shift, created = ManagerRequirement.objects.get_or_create(
+            manager=request.user,
             year=year,
             month=month,
-            manager=request.user,
-            defaults={
-                "content": content or "",
-                "hard_rule": hard_rule or ""
-            }
+            defaults={"hard_rule": hard_rule or {}, "content": content or ""}
         )
 
         if not created:
             updated = False
-            if content is not None:
-                manager_req.content = content
-                updated = True
             if hard_rule is not None:
-                manager_req.hard_rule = hard_rule
+                shift.hard_rule = hard_rule
+                updated = True
+            if content is not None:
+                shift.content = content
                 updated = True
 
             if updated:
-                manager_req.save()
+                shift.save()
                 return JsonResponse({"message": "Manager shift requirement updated"}, status=200)
             else:
                 return JsonResponse({"message": "No changes provided"}, status=400)
 
         return JsonResponse({"message": "Manager shift requirement created"}, status=201)
+
