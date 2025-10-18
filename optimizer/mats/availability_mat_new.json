@@ -1,0 +1,164 @@
+{
+  "Alice": {
+    "availability_calendar": {
+      "2025-11-01": {
+        "shift_0": "X",
+        "shift_1": "O",
+        "shift_2": "O",
+        "shift_3": "O",
+        "shift_4": "O"
+      },
+      "2025-11-02": {
+        "shift_0": "X",
+        "shift_1": "X",
+        "shift_2": "O",
+        "shift_3": "X",
+        "shift_4": "X"
+      },
+      "2025-11-03": {
+        "shift_0": "O",
+        "shift_1": "O",
+        "shift_2": "X",
+        "shift_3": "X",
+        "shift_4": "X"
+      },
+      "2025-11-04": {
+        "shift_0": "X",
+        "shift_1": "X",
+        "shift_2": "O",
+        "shift_3": "O",
+        "shift_4": "X"
+      },
+      "2025-11-05": {
+        "shift_0": "X",
+        "shift_1": "X",
+        "shift_2": "O",
+        "shift_3": "X",
+        "shift_4": "O"
+      },
+      "2025-11-06": {
+        "shift_0": "X",
+        "shift_1": "O",
+        "shift_2": "X",
+        "shift_3": "O",
+        "shift_4": "O"
+      },
+      "2025-11-07": {
+        "shift_0": "X",
+        "shift_1": "O",
+        "shift_2": "X",
+        "shift_3": "X",
+        "shift_4": "O"
+      }
+    },
+    "content": "Alice prefers working morning shifts on weekdays and evenings on weekends."
+  },
+  "Bob": {
+    "availability_calendar": {
+      "2025-11-01": {
+        "shift_0": "X",
+        "shift_1": "O",
+        "shift_2": "O",
+        "shift_3": "O",
+        "shift_4": "X"
+      },
+      "2025-11-02": {
+        "shift_0": "X",
+        "shift_1": "X",
+        "shift_2": "O",
+        "shift_3": "O",
+        "shift_4": "O"
+      },
+      "2025-11-03": {
+        "shift_0": "O",
+        "shift_1": "O",
+        "shift_2": "X",
+        "shift_3": "X",
+        "shift_4": "O"
+      },
+      "2025-11-04": {
+        "shift_0": "O",
+        "shift_1": "O",
+        "shift_2": "X",
+        "shift_3": "O",
+        "shift_4": "X"
+      },
+      "2025-11-05": {
+        "shift_0": "X",
+        "shift_1": "X",
+        "shift_2": "O",
+        "shift_3": "X",
+        "shift_4": "X"
+      },
+      "2025-11-06": {
+        "shift_0": "O",
+        "shift_1": "X",
+        "shift_2": "X",
+        "shift_3": "O",
+        "shift_4": "X"
+      },
+      "2025-11-07": {
+        "shift_0": "O",
+        "shift_1": "O",
+        "shift_2": "X",
+        "shift_3": "X",
+        "shift_4": "X"
+      }
+    },
+    "content": "Bob prefers even-numbered dates and cannot work Sunday mornings."
+  },
+  "Carol": {
+    "availability_calendar": {
+      "2025-11-01": {
+        "shift_0": "O",
+        "shift_1": "O",
+        "shift_2": "X",
+        "shift_3": "O",
+        "shift_4": "X"
+      },
+      "2025-11-02": {
+        "shift_0": "X",
+        "shift_1": "X",
+        "shift_2": "O",
+        "shift_3": "X",
+        "shift_4": "X"
+      },
+      "2025-11-03": {
+        "shift_0": "O",
+        "shift_1": "X",
+        "shift_2": "X",
+        "shift_3": "X",
+        "shift_4": "O"
+      },
+      "2025-11-04": {
+        "shift_0": "X",
+        "shift_1": "O",
+        "shift_2": "X",
+        "shift_3": "X",
+        "shift_4": "X"
+      },
+      "2025-11-05": {
+        "shift_0": "O",
+        "shift_1": "X",
+        "shift_2": "O",
+        "shift_3": "X",
+        "shift_4": "O"
+      },
+      "2025-11-06": {
+        "shift_0": "O",
+        "shift_1": "O",
+        "shift_2": "X",
+        "shift_3": "O",
+        "shift_4": "O"
+      },
+      "2025-11-07": {
+        "shift_0": "O",
+        "shift_1": "X",
+        "shift_2": "X",
+        "shift_3": "X",
+        "shift_4": "O"
+      }
+    },
+    "content": "Carol prefers evening shifts but can fill in mornings if needed."
+  }
+}
