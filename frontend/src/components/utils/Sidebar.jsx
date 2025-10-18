@@ -28,7 +28,7 @@ const Sidebar = () => {
   const EmployeeMenu = [
     { text: "Home", path: "/" },
     { text: "Dashboard", path: "/dashboard/employee" },
-    { text: "Shift Input", path: "/availabilityCalendar/employee" },
+    { text: "Shift Input", path: "/input/employee" },
     { text: "Settings", path: "/settings" },
     { text: "Logout", path: "/logout" },
   ];
@@ -37,8 +37,7 @@ const Sidebar = () => {
     { text: "Home", path: "/" },
     { text: "Dashboard", path: "/dashboard/manager" },
     { text: "Shift Management", path: "/dashboard/shiftManager" },
-    { text: "Shift Optimization", path: "/so" },
-    { text: "Settings", path: "/shiftSetting" },
+    { text: "Shift Optimization", path: "/input/manager" },
     { text: "Logout", path: "/logout" },
   ];
 

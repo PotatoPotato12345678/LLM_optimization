@@ -11,10 +11,10 @@ import {
 } from "@mui/material";
 
 const debugUsers = [
-  { label: "Admin", username: "admin", password: "admin" },
   { label: "Manager", username: "manager_1", password: "m_1" },
   { label: "Employee 1", username: "employee_1", password: "e_1" },
   { label: "Employee 2", username: "employee_2", password: "e_2" },
+  { label: "Employee 3", username: "employee_3", password: "e_3" },
 ];
 
 const Login = () => {

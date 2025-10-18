@@ -30,7 +30,7 @@ const ShiftManager = () => {
       const year = nextMonthYear;
       const month = nextMonth + 1;
       const res = await fetch(
-        `http://localhost:8000/api/shift/manager/?year=${year}&month=${month}`,
+        `http://localhost:8000/api/shift/employee/?year=${year}&month=${month}`,
         { credentials: "include" }
       );
 

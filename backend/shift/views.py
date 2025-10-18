@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import ShiftRequirement
+from .models import ShiftRequirement, ManagerRequirement
 from optimizedShift.models import OptimizedShift
 from backend.LLM_optimizer import shiftOptimizer
 import json
@@ -36,25 +36,42 @@ class ShiftEmployee(LoginRequiredMixin,View):
         return None
     
     def get(self, request):
-        invalid_role = self.employee_only(request)
-        if invalid_role:
-            return invalid_role
-
+        """
+        Returns shift requirements differently depending on the requester:
+        - Employee: returns only their own shift requirement for the given month/year.
+        - Manager: returns all employees' shift requirements for the given month/year.
+        """
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
 
-        try:
-            client_shift_req = get_object_or_404(
-                ShiftRequirement, employee=request.user, year=year, month=month
-            )
-            return JsonResponse({
-                "content": client_shift_req.content,
-                "availability_calendar": client_shift_req.availability_calendar
-            }, status=200)
-        except Http404:
-            return JsonResponse({"error": "Shift requirement not found"}, status=404)
+        if request.user.is_manager:  # Assuming your User model has is_manager field
+            # Manager view: return all employees
+            shift_reqs = ShiftRequirement.objects.filter(year=year, month=month)
+            if not shift_reqs.exists():
+                return JsonResponse({"error": "No shift requirements found"}, status=404)
+
+            result = {}
+            for req in shift_reqs:
+                result[req.employee.username] = {
+                    "content": req.content,
+                    "availability_calendar": req.availability_calendar,
+                }
+            return JsonResponse(result, status=200, safe=False)
+        else:
+            # Employee view: return only their own
+            try:
+                shift_req = ShiftRequirement.objects.get(
+                    employee=request.user, year=year, month=month
+                )
+                return JsonResponse({
+                    "content": shift_req.content,
+                    "availability_calendar": shift_req.availability_calendar
+                }, status=200)
+            except ShiftRequirement.DoesNotExist:
+                return JsonResponse({"error": "Shift requirement not found"}, status=404)
+
 
 
     def post(self, request):
@@ -194,39 +211,95 @@ class ShiftManager(LoginRequiredMixin,View):
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
 
-        # Get all shift requirements for that month and year
-        shift_reqs = ShiftRequirement.objects.filter(year=year, month=month)
+        # Try to get the manager requirement for this month
+        manager_req = ManagerRequirement.objects.filter(
+            manager=request.user, year=year, month=month
+        ).first()
 
-        if not shift_reqs.exists():
-            return JsonResponse({"error": "No shift requirements found"}, status=404)
+        if not manager_req:
+            return JsonResponse({"error": "Manager requirement not found"}, status=404)
 
-        # Build a dictionary with employee usernames as keys
-        result = {}
-        for req in shift_reqs:
-            result[req.employee.username] = {
-                "content": req.content,
-                "availability_calendar": req.availability_calendar,
-            }
-
-        return JsonResponse(result, status=200, safe=False)
-
+        return JsonResponse(
+            {
+                "hard_rule": manager_req.hard_rule,
+                "content": manager_req.content,
+            },
+            status=200,
+        )
 
     def post(self, request):
         invalid_role = self.manager_only(request)
         if invalid_role:
             return invalid_role
+
         year = request.GET.get('year')
         month = request.GET.get('month')
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
 
         try:
-            data = self.util_get_shift_reqs(year, month)
-        except Http404:
-            return JsonResponse({"error": "No shift requirements found"}, status=404)
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-        response = shiftOptimizer(data)
-        # save it to optimizedShift table in DB
-        OptimizedShift.objects.create(shift=response, year=year, month=month)
+        content = data.get("content")
+        hard_rule = data.get("hardRule")
 
-        return JsonResponse({"data": response})
+        if content is None or hard_rule is None:
+            return JsonResponse({'error': 'Both content and hardRule are required'}, status=400)
+
+        ManagerRequirement.objects.create(
+            content=content,
+            hard_rule=hard_rule,
+            year=year,
+            month=month,
+            manager=request.user
+        )
+
+        return JsonResponse({"message": "Manager shift requirement created"}, status=201)
+
+
+    def put(self, request):
+        invalid_role = self.manager_only(request)
+        if invalid_role:
+            return invalid_role
+
+        year = request.GET.get('year')
+        month = request.GET.get('month')
+        if not (year and month):
+            return JsonResponse({"error": "year and month are required"}, status=400)
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+        content = data.get("content")
+        hard_rule = data.get("hardRule")
+
+        manager_req, created = ManagerRequirement.objects.get_or_create(
+            year=year,
+            month=month,
+            manager=request.user,
+            defaults={
+                "content": content or "",
+                "hard_rule": hard_rule or ""
+            }
+        )
+
+        if not created:
+            updated = False
+            if content is not None:
+                manager_req.content = content
+                updated = True
+            if hard_rule is not None:
+                manager_req.hard_rule = hard_rule
+                updated = True
+
+            if updated:
+                manager_req.save()
+                return JsonResponse({"message": "Manager shift requirement updated"}, status=200)
+            else:
+                return JsonResponse({"message": "No changes provided"}, status=400)
+
+        return JsonResponse({"message": "Manager shift requirement created"}, status=201)
