@@ -1,17 +1,18 @@
-import react from "react";
 import { useAuth } from "./utils/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Paper } from "@mui/material";
 
 const Home = () => {
-  const { userRef, login, logout } = useAuth();
+  const { userRef, logout } = useAuth();
   const navigate = useNavigate();
 
   return (
     <div>
       <h1>Welcome to the Home Page</h1>
       <p>This is the main landing page of the application.</p>
-      <a href ="https://www.notion.so/Shift-Management-Optimization-27f7a62de23e8091822bd841bed2deeb"> Documentation Page</a>
+      <a href="https://www.notion.so/Shift-Management-Optimization-27f7a62de23e8091822bd841bed2deeb">
+        {" "}
+        Documentation Page
+      </a>
 
       {userRef?.current ? (
         <>

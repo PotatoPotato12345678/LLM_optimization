@@ -1,26 +1,33 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, TextField } from "@mui/material";
 import AvailabilityCalendar from "./utils/AvailabilityCalendar";
-import { useAuth } from "./utils/AuthContext";
 
 let timeoutId;
 
 const EmployeeInput = () => {
-  const { userRef } = useAuth();
   const [content, setContent] = useState("");
 
-  const nextMonth = new Date().getMonth() === 11 ? 0 : new Date().getMonth() + 1;
-  const nextMonthYear = new Date().getMonth() === 11 ? new Date().getFullYear() + 1 : new Date().getFullYear();
+  const nextMonth =
+    new Date().getMonth() === 11 ? 0 : new Date().getMonth() + 1;
+  const nextMonthYear =
+    new Date().getMonth() === 11
+      ? new Date().getFullYear() + 1
+      : new Date().getFullYear();
 
   // Function to update content to backend
   const updateContent = async (value) => {
     try {
-      await fetch(`http://localhost:8000/api/shift/employee/?year=${nextMonthYear}&month=${nextMonth + 1}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ content: value }),
-      });
+      await fetch(
+        `http://localhost:8000/api/shift/employee/?year=${nextMonthYear}&month=${
+          nextMonth + 1
+        }`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ content: value }),
+        }
+      );
     } catch (err) {
       console.error("Error updating content:", err);
     }
@@ -37,10 +44,13 @@ const EmployeeInput = () => {
 
   // Optional: fetch current content when component mounts
   useEffect(() => {
-    const fetchContent = async () => {
+    // fetch current content when component mounts
+    (async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/api/shift/employee/?year=${nextMonthYear}&month=${nextMonth + 1}`,
+          `http://localhost:8000/api/shift/employee/?year=${nextMonthYear}&month=${
+            nextMonth + 1
+          }`,
           { credentials: "include" }
         );
         if (res.ok) {
@@ -50,8 +60,7 @@ const EmployeeInput = () => {
       } catch (err) {
         console.error("Error fetching content:", err);
       }
-    };
-    fetchContent();
+    })();
   }, [nextMonth, nextMonthYear]);
 
   return (
@@ -74,7 +83,7 @@ const EmployeeInput = () => {
           fullWidth
           value={content}
           onChange={handleChange}
-          sx={{ width: "95%", maxWidth: 1000  }}
+          sx={{ width: "95%", maxWidth: 1000 }}
         />
       </Box>
 

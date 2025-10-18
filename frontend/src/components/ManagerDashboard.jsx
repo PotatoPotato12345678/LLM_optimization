@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
 import { useAuth } from "./utils/AuthContext";
 import { useNavigate } from "react-router-dom";
 import ShiftCalendar from "./utils/ShiftCalendar";
 
 const Manager = () => {
-  const { userRef, logout } = useAuth();
+  const { userRef } = useAuth();
   const navigate = useNavigate();
 
   return (

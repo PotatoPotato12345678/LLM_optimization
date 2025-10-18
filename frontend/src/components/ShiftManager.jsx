@@ -6,7 +6,6 @@ import {
   TextField,
   Paper,
   Modal,
-  ChildModal,
   CircularProgress,
 } from "@mui/material";
 
@@ -27,46 +26,43 @@ const ShiftManager = () => {
   const nextMonthYear =
     today.getMonth() === 11 ? today.getFullYear() + 1 : today.getFullYear();
 
-  const [dates, setDates] = useState(generateDates(nextMonth, nextMonthYear));
+  const [dates] = useState(generateDates(nextMonth, nextMonthYear));
   const [data, setData] = useState({});
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [availability, setAvailability] = useState({});
   const [content, setContent] = useState("");
 
-  /** Fetch all employees’ availability for the selected month */
-  const fetchAvailability = async () => {
-    try {
-      const year = nextMonthYear;
-      const month = nextMonth + 1;
-      const res = await fetch(
-        `http://localhost:8000/api/shift/manager/?year=${year}&month=${month}`,
-        { credentials: "include" }
-      );
-
-      if (res.ok) {
-        const data = await res.json();
-        setData(data);
-
-        // Default to first employee
-        const firstEmployee = Object.keys(data)[0];
-        if (firstEmployee) {
-          const emp = data[firstEmployee];
-          setSelectedEmployee(firstEmployee);
-          setAvailability(emp.availability_calendar || {});
-          setContent(emp.content || "");
-        }
-      } else {
-        console.warn("No shift data found");
-      }
-    } catch (err) {
-      console.error("Error fetching availability:", err);
-    }
-  };
-
-  /** Fetch data once when the component mounts */
+  /** Fetch all employees' availability for the selected month */
   useEffect(() => {
-    fetchAvailability();
-  }, []);
+    (async () => {
+      try {
+        const year = nextMonthYear;
+        const month = nextMonth + 1;
+        const res = await fetch(
+          `http://localhost:8000/api/shift/manager/?year=${year}&month=${month}`,
+          { credentials: "include" }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          setData(data);
+
+          // Default to first employee
+          const firstEmployee = Object.keys(data)[0];
+          if (firstEmployee) {
+            const emp = data[firstEmployee];
+            setSelectedEmployee(firstEmployee);
+            setAvailability(emp.availability_calendar || {});
+            setContent(emp.content || "");
+          }
+        } else {
+          console.warn("No shift data found");
+        }
+      } catch (err) {
+        console.error("Error fetching availability:", err);
+      }
+    })();
+  }, [nextMonth, nextMonthYear]);
 
   /** Generate empty calendar if selected employee has no data */
   useEffect(() => {

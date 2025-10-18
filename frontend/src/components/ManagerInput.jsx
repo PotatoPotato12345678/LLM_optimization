@@ -1,13 +1,8 @@
 import { useState, useEffect } from "react";
 import { Box, Paper, Typography, TextField } from "@mui/material";
-import { useAuth } from "./utils/AuthContext";
 import ShiftSetting from "./utils/ShiftSetting";
 
-let timeoutIdHardRule;
-let timeoutIdContent;
-
 const ManagerInput = () => {
-  const { userRef } = useAuth();
   const [content, setContent] = useState("");
 
   const today = new Date();
