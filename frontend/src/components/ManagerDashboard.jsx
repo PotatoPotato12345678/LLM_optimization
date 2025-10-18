@@ -9,12 +9,10 @@ const Manager = () => {
 
   return (
     <div>
-      <h1>Welcome to the Dashboard</h1>
+      <h1>シフトカレンダー</h1>
       {userRef?.current ? (
         <>
           <section id="dashboard-content">
-
-            <h2>Shift Calendar</h2>
             <ShiftCalendar />
           </section>
         </>

@@ -6,12 +6,11 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
-  MenuItem,
-  Paper,
   Divider,
   Grid,
   Snackbar,
   Alert,
+  Paper,
 } from "@mui/material";
 
 const ShiftSetting = () => {
@@ -28,51 +27,67 @@ const ShiftSetting = () => {
 
   const [saved, setSaved] = useState(false);
 
-  // Fetch saved settings on mount
+  const nextMonth = new Date().getMonth() === 11 ? 0 : new Date().getMonth() + 1;
+  const nextMonthYear =
+    new Date().getMonth() === 11 ? new Date().getFullYear() + 1 : new Date().getFullYear();
+
+  // Fetch manager's hard_rule JSON on mount
   useEffect(() => {
     const fetchSettings = async () => {
-      // try {
-      //   const res = await fetch("http://localhost:8000/api/settings/", {
-      //     credentials: "include",
-      //   });
-      //   if (res.ok) {
-      //     const data = await res.json();
-      //     setSettings(data);
-      //   }
-      // } catch (err) {
-      //   console.error("Error fetching settings:", err);
-      // }
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/shift/manager/?year=${nextMonthYear}&month=${nextMonth + 1}`,
+          { credentials: "include" }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          // data.hard_rule assumed to be a JSON object
+          if (data.hard_rule) {
+            setSettings(data.hard_rule);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching manager hard_rule:", err);
+      }
     };
     fetchSettings();
-  }, []);
+  }, [nextMonth, nextMonthYear]);
 
-  // Save to backend
+  // Save the JSON settings to hard_rule
   const handleSave = async () => {
     try {
-      // const res = await fetch("http://localhost:8000/api/settings/", {
-      //   method: "PUT",
-      //   headers: { "Content-Type": "application/json" },
-      //   credentials: "include",
-      //   body: JSON.stringify(settings),
-      // });
-      // if (res.ok) {
-      //   setSaved(true);
-      // } else {
-      //   console.error("Failed to save settings");
-      // }
+      // Only send the settings object as hardRule
+      const payload = { hardRule: settings };
+
+      const res = await fetch(
+        `http://localhost:8000/api/shift/manager/?year=${nextMonthYear}&month=${nextMonth + 1}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
+      if (res.ok) setSaved(true);
+      else {
+        const errorData = await res.json();
+        console.error("Failed to save hardRule:", errorData);
+      }
     } catch (err) {
-      console.error("Error saving settings:", err);
+      console.error("Error saving hard_rule:", err);
     }
   };
 
+
   const toggleDay = (day) => {
     setSettings((prev) => {
-      const isActive = prev.working_days.includes(day);
+      const workingDays = prev.working_days || [];
+      const isActive = workingDays.includes(day);
       return {
         ...prev,
         working_days: isActive
-          ? prev.working_days.filter((d) => d !== day)
-          : [...prev.working_days, day],
+          ? workingDays.filter((d) => d !== day)
+          : [...workingDays, day],
       };
     });
   };
@@ -87,7 +102,7 @@ const ShiftSetting = () => {
     <Box sx={{ p: 4, display: "flex", justifyContent: "center" }}>
       <Paper sx={{ p: 4, width: "100%", maxWidth: 900 }}>
         <Typography variant="h4" sx={{ mb: 3 }}>
-          Workplace Settings
+          Workplace Settings / Hard Rule
         </Typography>
 
         <Grid container spacing={3}>
@@ -125,7 +140,7 @@ const ShiftSetting = () => {
                 <Button
                   key={day}
                   variant={
-                    settings.working_days.includes(day)
+                    (settings.working_days || []).includes(day)
                       ? "contained"
                       : "outlined"
                   }
@@ -142,7 +157,7 @@ const ShiftSetting = () => {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={settings.allow_weekend_work}
+                  checked={settings.allow_weekend_work || false}
                   onChange={(e) =>
                     handleChange("allow_weekend_work", e.target.checked)
                   }
@@ -182,7 +197,7 @@ const ShiftSetting = () => {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={settings.publish_auto}
+                  checked={settings.publish_auto || false}
                   onChange={(e) =>
                     handleChange("publish_auto", e.target.checked)
                   }

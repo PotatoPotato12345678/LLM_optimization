@@ -90,7 +90,7 @@ const ShiftManager = () => {
     <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
       <Paper sx={{ p: 2, width: "100%", maxWidth: 1000 }}>
         <Typography variant="h4" sx={{ mb: 2 }}>
-          <strong>Employee Shift Preference Viewer</strong>
+          <strong>従業員シフト表提出</strong>
         </Typography>
         {/* Employee selector */}
         <Box sx={{ mb: 2 }}>
@@ -104,6 +104,22 @@ const ShiftManager = () => {
               {emp}
             </Button>
           ))}
+        </Box>
+
+        {/* Employee content */}
+        <Box sx={{ mb: 4 }}>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+            希望欄
+            </Typography>
+            <TextField
+            label="Content"
+            multiline
+            minRows={4}
+            maxRows={8}
+            fullWidth
+            value={content}
+            sx={{ width: "100%", maxWidth: 1000  }}
+            />
         </Box>
         
         <Paper sx={{ p: 2, width: "96%", height: "77%", maxWidth: 1000, overflowX: "visible", position: "relative" }}>
@@ -171,22 +187,6 @@ const ShiftManager = () => {
             })}
             </Box>
         </Paper>
-
-        {/* Employee content */}
-        <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>
-            Content
-            </Typography>
-            <TextField
-            label="Content"
-            multiline
-            minRows={4}
-            maxRows={8}
-            fullWidth
-            value={content}
-            sx={{ width: "100%", maxWidth: 1000  }}
-            />
-        </Box>
       </Paper>
     </Box>
   );

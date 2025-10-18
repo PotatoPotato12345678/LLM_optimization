@@ -29,7 +29,6 @@ const Sidebar = () => {
     { text: "Home", path: "/" },
     { text: "Dashboard", path: "/dashboard/employee" },
     { text: "Shift Input", path: "/input/employee" },
-    { text: "Settings", path: "/settings" },
     { text: "Logout", path: "/logout" },
   ];
 

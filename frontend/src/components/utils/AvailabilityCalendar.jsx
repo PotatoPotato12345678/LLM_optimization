@@ -25,6 +25,7 @@ const AvailabilityCalendar = () => {
       const key = date.toISOString().slice(0, 10);
       init[key] = { morning: "X", evening: "X" };
     });
+    console.log(init)
     setAvailability(init);
     fetchAvailability();
   }, [dates]);

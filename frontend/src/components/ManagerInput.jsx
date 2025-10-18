@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, TextField } from "@mui/material";
+import { Box, Paper, Typography, TextField } from "@mui/material";
 import { useAuth } from "./utils/AuthContext";
 import ShiftSetting from "./utils/ShiftSetting"
 
@@ -67,48 +67,50 @@ const ManagerInput = () => {
   };
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Manager Requirements
-      </Typography>
-
-      {/* Hard Rules Input */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Hard Rules
+    <Box sx={{ p: 4, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+      <Paper sx={{ p: 4, width: "100%", maxWidth: 1000 }}>
+        <Typography variant="h4" sx={{ mb: 3, textAlign: "center" }}>
+          Manager Requirements
         </Typography>
-        <TextField
-          label="Hard Rules"
-          placeholder="e.g., Each employee must have 2 days off per week, no night shifts after consecutive days, etc."
-          multiline
-          minRows={4}
-          maxRows={8}
-          fullWidth
-          value={hardRule}
-          onChange={handleHardRuleChange}
-          sx={{ width: "95%", maxWidth: 1000 }}
-        />
-      </Box>
 
-      {/* Content / Notes Input */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Additional Notes
-        </Typography>
-        <TextField
-          label="Content"
-          placeholder="General scheduling notes, shift priorities, or temporary adjustments..."
-          multiline
-          minRows={4}
-          maxRows={8}
-          fullWidth
-          value={content}
-          onChange={handleContentChange}
-          sx={{ width: "95%", maxWidth: 1000 }}
-        />
-      </Box>
-      <ShiftSetting/>
+        {/* Hard Rules Input */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Hard Rules
+          </Typography>
+          <TextField
+            label="Hard Rules"
+            placeholder="e.g., Each employee must have 2 days off per week, no night shifts after consecutive days, etc."
+            multiline
+            minRows={4}
+            maxRows={8}
+            fullWidth
+            value={hardRule}
+            onChange={handleHardRuleChange}
+          />
+        </Box>
+
+        {/* Content / Notes Input */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Additional Notes
+          </Typography>
+          <TextField
+            label="Content"
+            placeholder="General scheduling notes, shift priorities, or temporary adjustments..."
+            multiline
+            minRows={4}
+            maxRows={8}
+            fullWidth
+            value={content}
+            onChange={handleContentChange}
+          />
+        </Box>
+      </Paper>
+
+      <ShiftSetting />
     </Box>
+
   );
 };
 

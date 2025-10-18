@@ -11,10 +11,11 @@ import {
 } from "@mui/material";
 
 const debugUsers = [
-  { label: "Manager", username: "manager_1", password: "m_1" },
-  { label: "Employee 1", username: "employee_1", password: "e_1" },
-  { label: "Employee 2", username: "employee_2", password: "e_2" },
-  { label: "Employee 3", username: "employee_3", password: "e_3" },
+  { label: "マネージャー", username: "manager_1", password: "m_1" },
+  { label: "レオ", username: "Leo", password: "e_1" },
+  { label: "タム", username: "Tam", password: "e_2" },
+  { label: "キム", username: "Kim", password: "e_3" },
+  { label: "とうま", username: "Toma", password: "e_4" },
 ];
 
 const Login = () => {
@@ -51,7 +52,7 @@ const Login = () => {
         minHeight: "100vh",
       }}
     >
-      <Paper elevation={3} sx={{ padding: 3, width: theme.spacing(80) }}>
+      <Paper elevation={3} sx={{ padding: 3, width: theme.spacing(100) }}>
         <Typography variant="h4" mb={1}>Welcome to the Login Page</Typography>
         <Typography mb={2}>Please enter your credentials to log in.</Typography>
 

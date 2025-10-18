@@ -97,8 +97,49 @@ const ShiftCalendar = () => {
             return (
               <Paper key={key} sx={{ p: 1, textAlign: "center" }}>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>{key}</Typography>
-                <Button variant="contained" color="secondary" sx={{ width: "100%", mb: 0.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "pre-line", fontSize: "0.75rem", minWidth: 0, px: 0.5 }} disabled title={morning}>{morning}</Button>
-                <Button variant="contained" color="secondary" sx={{ width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "pre-line", fontSize: "0.75rem", minWidth: 0, px: 0.5 }} disabled title={evening}>{evening}</Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    width: "100%",
+                    mb: 0.5,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "pre-line",
+                    fontSize: "0.75rem",
+                    minWidth: 0,
+                    px: 0.5,
+                    pointerEvents: "none",
+                    cursor: "default",
+                    backgroundColor: "#70B2B2", // custom color (blue)
+                    color: "white",
+                    "&:hover": { backgroundColor: "#70B2B2" }, // optional hover tone
+                  }}
+                  title={morning}
+                >
+                  {morning}
+                </Button>
+
+                <Button
+                  variant="contained"
+                  sx={{
+                    width: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "pre-line",
+                    fontSize: "0.75rem",
+                    minWidth: 0,
+                    px: 0.5,
+                    pointerEvents: "none",
+                    cursor: "default",
+                    backgroundColor: "#70B2B2", // custom color (purple)
+                    color: "white",
+                    "&:hover": { backgroundColor: "#70B2B2" },
+                  }}
+                  title={evening}
+                >
+                  {evening}
+                </Button>
+
               </Paper>
             );
           })}
