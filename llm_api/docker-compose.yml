@@ -3,10 +3,18 @@ version: '3.8'
 services:
   app:
     build: .
+    container_name: fastapi-app
     ports:
-      - "8001:8001"
+      - "8001:8000"  # Host:Container - Access via localhost:8001
     env_file:
       - .env
     volumes:
       - .:/app
     restart: unless-stopped
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    name: shared-network
+    driver: bridge

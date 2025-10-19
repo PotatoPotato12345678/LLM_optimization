@@ -56,7 +56,7 @@ def EE_generate(text_input, employee_list, employee_flat):
     """
     main_context = main_context_1 + main_context_2
 
-    client = OpenAI(api_key="IWuUV2-VnoYW32Er4lfqE_3T3BlbkFJcjEuI-yMoV6Y8gKxHfObuLjs2u_Utlxxvubgh339T2PfUVFyzxQCMH_ywkNqZjn392L396ZucA")
+    client = OpenAI(api_key=)
 
     class Employee(BaseModel):
         id: str

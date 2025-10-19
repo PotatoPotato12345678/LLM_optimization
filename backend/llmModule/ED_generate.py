@@ -83,7 +83,7 @@ def ED_generate(text_input):
     from pydantic import BaseModel
     from typing import List, Tuple
     import os
-    client = OpenAI(api_key="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")
+    client = OpenAI(api_key=)
     class ShiftItem(BaseModel):
         shift: int
         willingness: float

@@ -127,7 +127,9 @@ const ShiftManager = () => {
           method: "POST",
           credentials: "include",
         }
-      );
+      ).then((response) => { 
+        console.log("Optimization response:", response);
+        return response; });
 
       if (!res.ok) {
         const data = await res.json();

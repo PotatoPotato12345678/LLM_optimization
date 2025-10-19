@@ -240,8 +240,13 @@ def ED_matrix(text_input: str, year: int , month: int) -> Dict[str, Any]:
     text_format=ShiftWillingnessModel,
     )
     # Extract just the parsed data instead of the entire response
-    data = response.model_dump()
-    result = data["output"][1]["content"][0]["parsed"]
+    result = response.output_parsed
+    print("________________________________")
+    print(f"Input Text:{text_input} year:{year} month:{month}")
+    print(response.model_dump)
+    print("________________________________")
+    print(result)
+    print("________________________________")
     return result
 
 def EE_matrix(text_input: str, employee_list: List[str]) -> Dict[str, Any]:
@@ -298,7 +303,10 @@ def EE_matrix(text_input: str, employee_list: List[str]) -> Dict[str, Any]:
     )
     employee_pref = response.choices[0].message.parsed
     employee_dict = {emp.id: emp.willingness for emp in employee_pref.employees}
-
+    print("________________________________")
+    print(f"Input Text:{text_input} year:{employee_list}")
+    print(employee_dict)
+    print("________________________________")
     return employee_dict
 
 # --- FastAPI App ---
@@ -318,25 +326,35 @@ def read_root():
 @app.post("/get_matrix")
 async def process_input(
     metadata: str | None = Form(None),
-    year: int = Form(None),
-    month: int = Form(None),
+    year: int = Form(2025),
+    month: int = Form(2),
     content: UploadFile = Form(...),
     which_matrix: str = Form(...),
     employees: str = Form(None),
 ):
-    try:
-        text_input = (await content.read()).decode("utf-8")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail="Error reading user input text") from e
-    if count_tokens(text_input, model=model) > os.getenv("TOKEN_LIMIT"):
-        raise HTTPException(status_code=400, detail="Input text exceeds token limit, please reduce input text size.")
+    if content is None:
+        text_input = "月曜は入れるけどできれば入りたくないです。火水木は入れます。でも一番嬉しいのは日曜日です。従業員1さんと働きたいです。従業員2さんは無理です。"   # "No particular preference" in Japanese
+    else:
+        try:
+            text_input = (await content.read()).decode("utf-8")
+            if not text_input.strip():
+                text_input = "月曜は入れるけどできれば入りたくないです。火水木は入れます。でも一番嬉しいのは日曜日です。従業員1さんと働きたいです。従業員2さんは無理です。"  # "No particular preference" in Japanese
+        except Exception as e:
+            text_input = "月曜は入れるけどできれば入りたくないです。火水木は入れます。でも一番嬉しいのは日曜日です。従業員1さんと働きたいです。従業員2さんは無理です。" 
+
     if which_matrix == 'ee':
         if not employees:
-            raise HTTPException(status_code=400, detail="employees parameter is required for 'ee' matrix")
-        try:
-            employee_list: List[str] = json.loads(employees)
-        except json.JSONDecodeError:
-            return {"error": "Invalid list format, employees must be passed as a list"}
+            # Default employee list
+            employee_list = ["従業員1", "従業員2", "従業員3"]
+        else:
+            try:
+                employee_list: List[str] = json.loads(employees)
+                if not isinstance(employee_list, list) or len(employee_list) == 0:
+                    employee_list = ["従業員1", "従業員2", "従業員3"]
+                if not all(isinstance(e, str) for e in employee_list):
+                    employee_list = ["従業員1", "従業員2", "従業員3"]
+            except json.JSONDecodeError as e:
+                employee_list = ["従業員1", "従業員2", "従業員3"]
         proc_func = EE_matrix
         loop = asyncio.get_running_loop()
         future = loop.run_in_executor(

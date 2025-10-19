@@ -4,9 +4,11 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from types import SimpleNamespace
 from .models import ShiftRequirement, ManagerRequirement
 import json
+import json
+from optimizer.parse_views import parseViews
 
 from optimizer.parse_views import parseViews
 
@@ -207,7 +209,6 @@ class ShiftManager(LoginRequiredMixin,View):
             }, status=200)
         except ManagerRequirement.DoesNotExist:
             return JsonResponse({"hard_rule": {}, "content": ""}, status=200)
-
     def post(self, request):
         invalid_role = self.manager_only(request)
         if invalid_role:
@@ -218,12 +219,46 @@ class ShiftManager(LoginRequiredMixin,View):
         if not (year and month):
             return JsonResponse({"error": "year and month are required"}, status=400)
         
-        employee_data_dic = ShiftEmployee.get_for_manager(year, month)
-        if employee_data_dic.status_code != 200:
-            return employee_data_dic
+        employee_response = ShiftEmployee.get_for_manager(year, month)
+        if employee_response.status_code != 200:
+            return employee_response
 
-        assignment_matrix = parseViews.parseView(employee_data_dic)
+        # 2. Create the mock object that parseView expects
+        mock_data_for_parser = SimpleNamespace()
+        mock_data_for_parser.content = employee_response.content
+
+        # 3. Pass this new mock object to your unmodified parser
+        assignment_matrix = parseViews.parseView(mock_data_for_parser)
+        
         return JsonResponse({"data": assignment_matrix}, status=200)
+    # def post(self, request):
+    #     invalid_role = self.manager_only(request)
+    #     if invalid_role:
+    #         return invalid_role
+
+    #     year = request.GET.get("year")
+    #     month = request.GET.get("month")
+    #     if not (year and month):
+    #         return JsonResponse({"error": "year and month are required"}, status=400)
+        
+    #     # employee_data_dic = ShiftEmployee.get_for_manager(year, month)
+    #     # if employee_data_dic.status_code != 200:
+    #     #     return employee_data_dic
+
+    #     # assignment_matrix = parseViews.parseView(employee_data_dic)
+    #     # return JsonResponse({"data": assignment_matrix}, status=200)
+    #     employee_response = ShiftEmployee.get_for_manager(year, month)
+    #     if employee_response.status_code != 200:
+    #         return employee_response
+
+    #     # Decode the JSON content to get the actual dictionary
+    #     employee_data_dic = json.loads(employee_response.content)
+
+    #     # Now, pass the clean dictionary to your parser
+    #     assignment_matrix = parseViews.parseView(employee_data_dic)
+        
+    #     # This will now work correctly
+    #     return JsonResponse({"data": assignment_matrix}, status=200)
 
     def put(self, request):
         invalid_role = self.manager_only(request)

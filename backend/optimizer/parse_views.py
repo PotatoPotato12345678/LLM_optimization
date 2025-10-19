@@ -28,11 +28,13 @@ class parseViews(View):
         E = [k for k in data.keys()]
         M_A = extract_A(data)
         logger.info(M_A)
+        employee_list = list(data.keys())
         M_LLM_ED = extract_ED(data)
         logger.info("cappy")
-        M_LLM_EE = extract_EE(data)
+        M_LLM_EE = extract_EE(data, employee_list)
 
-        with open('data_test.json', 'w') as f:
+
+        with open('./optimizer/data.json', 'w') as f:
             json.dump({
                 "E": E,
                 "n": len(E),
@@ -43,6 +45,15 @@ class parseViews(View):
                 "M_LLM_EE": M_LLM_EE
             }, f, indent=4)
 
-        return JsonResponse({"message": "Successfully created shift requirement"}, status=201)
+        # Return the actual calculated data as a dictionary
+        return {
+            "E": E,
+            "n": len(E),
+            "S": 2,
+            "m": 2,
+            "M_A": M_A,
+            "M_LLM_ED": M_LLM_ED,
+            "M_LLM_EE": M_LLM_EE
+        }
 
 
