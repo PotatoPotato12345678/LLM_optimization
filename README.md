@@ -60,19 +60,19 @@ Used **Python** and **Pyomo** (Python package for solving mathematical optimizat
 ### Objective Function
 **ED Loss**
 ![EDLoss](images/EDLoss.svg)  
-EDLoss calculates:
+EDLoss calculates:  
 	1. Element-wise difference between $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$ add all the values and gets mean  
-	2. Employee-wise cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}  
-	3. Cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}  
+	2. Employee-wise cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$  
+	3. Cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$  
 And gets summation of all of terms calculated above
 
 **EE Loss**  
 ![EELoss](images/EELoss.svg)  
 
-EELoss calculates:
+EELoss calculates:  
 	1. Element-wise difference between $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$ add all the values and gets mean  
-	2. Employee-wise cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}  
-	3. Cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}  
+	2. Employee-wise cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$  
+	3. Cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$  
 And gets summation of all of terms calculated above  
   
 $\alpha$, $\beta$, $\gamma$ are weights which will be applied to each element of $EDLoss$ and $EELoss$
