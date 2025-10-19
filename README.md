@@ -49,7 +49,7 @@ Used **Python** and **Pyomo** (Python package for solving mathematical optimizat
 
 - These variables are used to explain **Primary Variables**
 ### Primary Variables (Matrices)
-![PrimaryVariables(Matrices)]（images/PrimaryVariables(Matrices).svg）
+![PrimaryVariables(Matrices)]（images/PrimaryVariables(Matrices).svg)
 ### Decision Variables
 ![DecisionVariables.svg]  
 - **Decision Variables** are matrices that would be generated as a result
