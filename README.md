@@ -40,54 +40,25 @@ Used **Python** and **Pyomo** (Python package for solving mathematical optimizat
 - This module is mathematical optimizer to solve optimization problem
 - Implemented mathematical expression and function and solve the problem
 ### Primary Variables
-$$
-\begin{aligned}
-\text{Employee}: \quad & E = \{ e_1, e_2, \ldots, e_i \} &\quad \text{Employee} \\[6pt] 
-\text{Days}: \quad & D = \{ d_1, d_2, \ldots, d_j\} & \quad \text{Days in Month} \\[6pt]
-\text{Shifts}: \quad & S =\{s_1, s_2, \dots, s_k\} & \quad \text{Shifts in a day} \\[6pt]
-\end{aligned}
-$$
+![Primary Variables](https://latex.codecogs.com/svg.image?\begin{aligned}\text{Employee}:\quad&E=\{e_1,e_2,\ldots,e_i\}&\quad\text{Employee}\\[6pt]\text{Days}:\quad&D=\{d_1,d_2,\ldots,d_j\}&\quad\text{Days&space;in&space;Month}\\[6pt]\text{Shifts}:\quad&S=\{s_1,s_2,\dots,s_k\}&\quad\text{Shifts&space;in&space;a&space;day}\\[6pt]\end{aligned})
 - These variables are primary variables
 - Primary variables are used to defining the problem
 ### Supplementary Variables
-$$
-\begin{aligned}
-i&& \text{The number of employee} \\[6pt]
-j&& \text{The number of days in a month} \\[6pt]
-k&& \text{The number of shifts in a day}
-\end{aligned}
-
-$$
+![Supplementary Variables](https://latex.codecogs.com/svg.image?\begin{aligned}i&&\text{The&space;number&space;of&space;employee}\\[6pt]j&&\text{The&space;number&space;of&space;days&space;in&space;a&space;month}\\[6pt]k&&\text{The&space;number&space;of&space;shifts&space;in&space;a&space;day}\end{aligned})
 - These variables are used to explain **Primary Variables**
 ### Primary Variables (Matrices)
-$$
-\begin{aligned}
-\text{Employee-Day Matrix}: \quad & M_{LLM, E, D, S} \in \mathbb{R}^{E \times D \times S} \quad & \text{(LLM output)} \\[6pt]
-\text{Employee-Employee Matrix}: \quad & M_{LLM, E, D, S} \in \mathbb{R}^{E \times E'} \quad & \text{(LLM output)} \\[6pt]
-\text{Assignment Matrix}: \quad & A_{E, D, S} \in \mathbb{R}^{E \times D \times S} \quad & \text{Shift assignments} \\[6pt]
-& \quad \quad \quad \left\{ \begin{array}{ll} 1 & \text{if assigned} \\ 0 & \text{otherwise} \end{array} \right. \quad \text{for } E \times D \times S \\[6pt]
-\end{aligned}
-$$
+![Primary Variables (Matrix)](https://latex.codecogs.com/svg.image?\begin{aligned}\text{Employee-Day&space;Matrix}:\quad&M_{LLM,E,D,S}\in\mathbb{R}^{E\times&space;D\times&space;S}\quad&\text{(LLM&space;output)}\\[6pt]\text{Employee-Employee&space;Matrix}:\quad&M_{LLM,E,D,S}\in\mathbb{R}^{E\times&space;E'}\quad&\text{(LLM&space;output)}\\[6pt]\text{Assignment&space;Matrix}:\quad&A_{E,D,S}\in\mathbb{R}^{E\times&space;D\times&space;S}\quad&\text{Shift&space;assignments}\\[6pt]&\quad\quad\quad\left\{\begin{array}{ll}1&\text{if&space;assigned}\\0&\text{otherwise}\end{array}\right.\quad\text{for}E\times&space;D\times&space;S\\[6pt]\end{aligned})
 ### Decision Variables
-$$
-\begin{aligned}
-\text{Employee-Day Matrix}: \quad & M_{sugg, E, D, S} \in \mathbb{R}^{E \times D \times S} \quad & \text{(Optimized output)} \\[6pt]
-\text{Employee-Employee Matrix}: \quad & M_{sugg, E, E'} \in \mathbb{R}^{E \times E'} \quad & \text{(Optimized output)} \\[6pt]
-\end{aligned}
-$$
+![Decision Variables](https://latex.codecogs.com/svg.image?\begin{aligned}\text{Employee-Day&space;Matrix}:\quad&M_{sugg,E,D,S}\in\mathbb{R}^{E\times&space;D\times&space;S}\quad&\text{(Optimized&space;output)}\\[6pt]\text{Employee-Employee&space;Matrix}:\quad&M_{sugg,E,E'}\in\mathbb{R}^{E\times&space;E'}\quad&\text{(Optimized&space;output)}\\[6pt]\end{aligned})
 - **Decision Variables** are matrices that would be generated as a result
 - These would be the solution of provided problem
 ### Constraints
-$$
-\begin{aligned} \forall d \in D, \; \forall s \in S, \quad & \sum_{e \in E} A_{\text{E,D,S}}(e, d, s) = 2 & \text{for each shift, exact two employees work} \\[6pt] \forall e \in E, \quad & \sum_{d\in D} \sum_{s\in S} A_{\text{E,D,S}}(e, d, s) > 0 & \text{Each employee has to work once a week at least} \\[6pt] \forall e \in E, \quad & \sum_{d\in D} \sum_{s\in S} A_{\text{E,D,S}}(e, d, s) \times H_{shift} \le 40 & \text{Each employee cannot work more than 40 hours per week} \\[6pt] \forall e \in E, \forall d \in D, \quad & \sum_{s\in S} A_{\text{E,D,S}}(e, d, s) \times H_{shift} \le 8 & \text{Each employee cannot work more than 8 hours in a day} \end{aligned}
-$$
+![Constrains](https://latex.codecogs.com/svg.image?\begin{aligned}\forall&space;d\in&space;D,\;\forall&space;s\in&space;S,\quad&\sum_{e\in&space;E}A_{\text{E,D,S}}(e,d,s)=2&\text{for&space;each&space;shift,exact&space;two&space;employees&space;work}\\[6pt]\forall&space;e\in&space;E,\quad&\sum_{d\in&space;D}\sum_{s\in&space;S}A_{\text{E,D,S}}(e,d,s)>0&\text{Each&space;employee&space;has&space;to&space;work&space;once&space;a&space;week&space;at&space;least}\\[6pt]\forall&space;e\in&space;E,\quad&\sum_{d\in&space;D}\sum_{s\in&space;S}A_{\text{E,D,S}}(e,d,s)\times&space;H_{shift}\le&space;40&\text{Each&space;employee&space;cannot&space;work&space;more&space;than&space;40&space;hours&space;per&space;week}\\[6pt]\forall&space;e\in&space;E,\forall&space;d\in&space;D,\quad&\sum_{s\in&space;S}A_{\text{E,D,S}}(e,d,s)\times&space;H_{shift}\le&space;8&\text{Each&space;employee&space;cannot&space;work&space;more&space;than&space;8&space;hours&space;in&space;a&space;day}\end{aligned})
 - **Constraints** are the rules the optimizer should obey
 - Generated shift should fulfill every constraint
 ### Objective Function
 **ED Loss**
-$$
-EDLoss = \alpha (\frac{1}{|E| \times |D| \times |S|}\sum_{e \in E}\sum_{d \in D}\sum_{s \in S}|M_{LLM, e, d, s} - M_{sugg, e, d, s}|) + \beta (\sum_{e \in E} \frac{M_{LLM, e, D, S} \cdot {M_{sugg, e, D, S}}} {||M_{LLM, e, D, S||} \cdot ||M_{sugg, e, D, S||}} ) + \gamma (\frac{M_{LLM, e, D, S} \cdot {M_{sugg, e, D, S}}} {||M_{LLM, E, D, S||} \cdot ||M_{sugg, E, D, S||}})
-$$
+![ED Loss](https://latex.codecogs.com/svg.image?&space;EDLoss=\alpha(\frac{1}{|E|\times|D|\times|S|}\sum_{e\in&space;E}\sum_{d\in&space;D}\sum_{s\in&space;S}|M_{LLM,e,d,s}-M_{sugg,e,d,s}|)&plus;\beta(\sum_{e\in&space;E}\frac{M_{LLM,e,D,S}\cdot{M_{sugg,e,D,S}}}{||M_{LLM,e,D,S||}\cdot||M_{sugg,e,D,S||}})&plus;\gamma(\frac{M_{LLM,e,D,S}\cdot{M_{sugg,e,D,S}}}{||M_{LLM,E,D,S||}\cdot||M_{sugg,E,D,S||}}))
 EDLoss calculates:
 	1. Element-wise difference between $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$ add all the values and gets mean
 	2. Employee-wise cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$
@@ -95,9 +66,7 @@ EDLoss calculates:
 And gets summation of all of terms calculated above
 
 **EE Loss**
-$$
-EELoss = \alpha (\frac{1}{|E|^2}\sum_{e \in E}\sum_{e' \in E}|M_{LLM, e, e'} - M_{sugg, e, e'}|) + \beta (\sum_{e \in E} \frac{M_{LLM, e, E} \cdot {M_{sugg, e, E}}} {||M_{LLM, e, E||} \cdot ||M_{sugg, e, E||}} ) + \gamma (\frac{M_{LLM, E, E'} \cdot {M_{sugg, E, E'}}} {||M_{LLM, E, E'||} \cdot ||M_{sugg, E, E'||}})
-$$
+![EE Loss](https://latex.codecogs.com/svg.image?&space;EELoss=\alpha(\frac{1}{|E|^2}\sum_{e\in&space;E}\sum_{e'\in&space;E}|M_{LLM,e,e'}-M_{sugg,e,e'}|)&plus;\beta(\sum_{e\in&space;E}\frac{M_{LLM,e,E}\cdot{M_{sugg,e,E}}}{||M_{LLM,e,E||}\cdot||M_{sugg,e,E||}})&plus;\gamma(\frac{M_{LLM,E,E'}\cdot{M_{sugg,E,E'}}}{||M_{LLM,E,E'||}\cdot||M_{sugg,E,E'||}}))
 EELoss calculates:
 	1. Element-wise difference between $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$ add all the values and gets mean
 	2. Employee-wise cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$
@@ -108,26 +77,13 @@ $\alpha$, $\beta$, $\gamma$ are weights which will be applied to each element of
 Coefficients are fixed as one by default
 
 **Integrated Function**
-$$
-Obj = Z_1 \cdot EDLoss + Z_2 \cdot EELoss
-$$
+![Integrated Function](https://latex.codecogs.com/svg.image?&space;Obj=Z_1\cdot&space;EDLoss&plus;Z_2\cdot&space;EELoss)
 - Objective function calculates total loss value of $EDLoss$ and $EELoss$
 - $Z_1$ and $Z_2$ are weights which will be applied to $EDLoss$ and $EELoss$
 	- Coefficients are fixed as one by default
 
 **Objective**
-$$
-\begin{aligned}
-\min_{\substack{
-M_{\text{sugg}, E, D, S},\;
-M_{\text{sugg}, E, E'}\;
-}}
-& \text{Obj}\bigl(
-EDLoss,\;
-EELoss
-\bigr)
-\end{aligned}
-$$
+![Objective function](https://latex.codecogs.com/svg.image?\begin{aligned}\min_{\substack{M_{\text{sugg},E,D,S},\;M_{\text{sugg},E,E'}\;}}&\text{Obj}\bigl(EDLoss,\;EELoss\bigr)\end{aligned})
 The objective of this problem is:
 - Find $M_{\text{sugg}, E, D, S}$ and $M_{\text{sugg}, E, E'}$ which minimize the $EDLoss$ and $EELoss$
 - which follows all the pre-set constraints
