@@ -16,7 +16,7 @@ def solver():
     # Create a Pyomo data dictionary
     pyomo_data = {None: {
         'E': {None: data['E']},
-        # 'S': {None: data['S']},
+        'S': {None: 2},
         'n': {None: data['n']},
         'm': {None: data['m']},
         'time_open': {None: data['time_open']},

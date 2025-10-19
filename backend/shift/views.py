@@ -222,8 +222,7 @@ class ShiftManager(LoginRequiredMixin,View):
         if employee_data_dic.status_code != 200:
             return employee_data_dic
 
-        
-        assignment_matrix = parseViews(employee_data_dic)
+        assignment_matrix = parseViews.parseView(employee_data_dic)
         return JsonResponse({"data": assignment_matrix}, status=200)
 
     def put(self, request):

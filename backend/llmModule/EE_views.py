@@ -7,6 +7,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 import json
 
 from .EE_generate import EE_generate
+import logging
+logger = logging.getLogger(__name__)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class EE(View):
@@ -20,6 +22,9 @@ class EE(View):
         
         for k in data: # iterate through each employee
             text_input = data[k]["content"]
+            logger.info(f"--------------------------------------------------------------------")
+            logger.info(f"-----------------{text_input}-----------------")
+            logger.info(f"--------------------------------------------------------------------")
             EE_matrix[k] = EE_generate(text_input, employee_list, employee_flat)
         
         return JsonResponse(EE_matrix)

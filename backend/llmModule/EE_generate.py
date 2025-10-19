@@ -1,12 +1,17 @@
 import json
+import logging
 import tiktoken
 from openai import OpenAI
 from pydantic import BaseModel
 from typing import List, Tuple, Dict
 from typing import List
 
-
 def EE_generate(text_input, employee_list, employee_flat):
+    
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"type(text_input) -> {type(text_input)}")
+
     model = "gpt-5-mini-2025-08-07"
     main_context_1 = f"""
     The available employees are: {employee_flat}. Total employees are {len(employee_list)}.
@@ -51,7 +56,7 @@ def EE_generate(text_input, employee_list, employee_flat):
     """
     main_context = main_context_1 + main_context_2
 
-    client = OpenAI(api_key="")
+    client = OpenAI(api_key="IWuUV2-VnoYW32Er4lfqE_3T3BlbkFJcjEuI-yMoV6Y8gKxHfObuLjs2u_Utlxxvubgh339T2PfUVFyzxQCMH_ywkNqZjn392L396ZucA")
 
     class Employee(BaseModel):
         id: str
