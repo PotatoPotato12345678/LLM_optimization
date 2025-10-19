@@ -44,7 +44,7 @@ Used **Python** and **Pyomo** (Python package for solving mathematical optimizat
 - These variables are primary variables
 - Primary variables are used to defining the problem
 ### Supplementary Variables
-![Supplementary Variables](https://latex.codecogs.com/svg.image?\begin{aligned}i&&\text{The&space;number&space;of&space;employee}\\[6pt]j&&\text{The&space;number&space;of&space;days&space;in&space;a&space;month}\\[6pt]k&&\text{The&space;number&space;of&space;shifts&space;in&space;a&space;day}\end{aligned})
+![Supplementary Variables](https://latex.codecogs.com/svg.image?$$\begin{aligned}i&&\text{The&space;number&space;of&space;employee}\\[6pt]j&&\text{The&space;number&space;of&space;days&space;in&space;a&space;month}\\[6pt]k&&\text{The&space;number&space;of&space;shifts&space;in&space;a&space;day}\end{aligned}$$)
 - These variables are used to explain **Primary Variables**
 ### Primary Variables (Matrices)
 ![Primary Variables (Matrix)](https://latex.codecogs.com/svg.image?\begin{aligned}\text{Employee-Day&space;Matrix}:\quad&M_{LLM,E,D,S}\in\mathbb{R}^{E\times&space;D\times&space;S}\quad&\text{(LLM&space;output)}\\[6pt]\text{Employee-Employee&space;Matrix}:\quad&M_{LLM,E,D,S}\in\mathbb{R}^{E\times&space;E'}\quad&\text{(LLM&space;output)}\\[6pt]\text{Assignment&space;Matrix}:\quad&A_{E,D,S}\in\mathbb{R}^{E\times&space;D\times&space;S}\quad&\text{Shift&space;assignments}\\[6pt]&\quad\quad\quad\left\{\begin{array}{ll}1&\text{if&space;assigned}\\0&\text{otherwise}\end{array}\right.\quad\text{for}E\times&space;D\times&space;S\\[6pt]\end{aligned})
