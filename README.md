@@ -1,13 +1,13 @@
 # Introduction - Problem Definition
-- For managers at stores with a lat of employees, they should make shift schedule for every month.
-- Followings are the fators which make this process challenging
-	1. The number of employee is always changing
-	2. Everyone has different preference
-	3. Employees' preferences are also simultaneously changing
-	4. Manager should respect employees' preference as much as possible
-- Because the manager should respect employee's preference and availability as much as possible, considering all of them makes the job extremely time-consuming.
-- Also, this job should be done every month, this lowers manager's efficiency
-- Automate this job can enhance manager's efficiency and makes the job less expensive.
+- For managers at stores with a lot of employees, they need to make shift schedule every month.
+- Followings are the factors that make this process challenging
+	1. The number of employee can change from month to month
+	2. Everyone may have different preference
+	3. Individual employees' preferences may also change in time
+	4. Manager needs to respect employees' preference as much as possible while being within domain rules
+- Because the manager should respect employee's preference and availability as much as possible, considering all of the above mentioned makes the job extremely difficult and time-consuming.
+- Also, this job needs to be repeated every month, which lowers the manager's efficiency.
+- Automating this job can improve the workplace morale and increase manager's efficiency to overall reduce operating costs.
 
 # Methodology
 ![system_diagram.jpg](images/sysdiagram.jpg)
@@ -16,13 +16,12 @@
 | Module        | Technology stack                                  | Description                                                                                                        |
 | ------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Frontend      | React(JavaScript)<br>Django(Python)<br>PostgreSQL | Managers / Employee can enter their preference and availability using UI and natural language                      |
-| LLM Extractor | Python<br>OpenAI API                              | LLM will convert preference written in natural language into matrices                                              |
-| Optimizer     | Python<br>Pyomo<br>IPOPT (Solver)                 | Optimizer will generate optimized shift using information given by LLM Extractor                                   |
-| LLM Extractor | Python<br>OpenAI API                              | More than one shifts will be generated from optimizer. This module evaluates all of them and chooses the best one. |
+| LLM Extractor | Python<br>OpenAI API                              | LLM extracts individual preferences and converts them into constraints for the optimizer                                          |
+| Optimizer     | Python<br>Pyomo<br>IPOPT (Solver)                 | Optimizer will generate optimized shift using information given by the Extractor                                 
+| LLM Extractor | Python<br>OpenAI API                              | Multiple possible shifts are generated from optimizer. This module evaluates all of them and chooses the best one. |
 
 
 ## Frontend
-![[frontend.png]]
 Used **React(JavaScript)**, **Django(Python)** and **PostgreSQL** for implementation
 - **Synergy**: People can explain with whom they want to work with using natural language
 - **Availability**: People can input their availability in calendar
@@ -62,20 +61,20 @@ Used **Python** and **Pyomo** (Python package for solving mathematical optimizat
 **ED Loss**
 ![EDLoss](images/EDLoss.svg)  
 EDLoss calculates:
-	1. Element-wise difference between $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$ add all the values and gets mean
-	2. Employee-wise cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$
-	3. Cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$
+	1. Element-wise difference between $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$ add all the values and gets mean  
+	2. Employee-wise cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}  
+	3. Cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}  
 And gets summation of all of terms calculated above
 
 **EE Loss**  
 ![EELoss](images/EELoss.svg)  
 
 EELoss calculates:
-	1. Element-wise difference between $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$ add all the values and gets mean
-	2. Employee-wise cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$
-	3. Cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$
-And gets summation of all of terms calculated above
-
+	1. Element-wise difference between $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$ add all the values and gets mean  
+	2. Employee-wise cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}  
+	3. Cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}  
+And gets summation of all of terms calculated above  
+  
 $\alpha$, $\beta$, $\gamma$ are weights which will be applied to each element of $EDLoss$ and $EELoss$
 Coefficients are fixed as one by default
 
