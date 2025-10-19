@@ -17,7 +17,7 @@
 | ------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Frontend      | React(JavaScript)<br>Django(Python)<br>PostgreSQL | Managers / Employee can enter their preference and availability using UI and natural language                      |
 | LLM Extractor | Python<br>OpenAI API                              | LLM extracts individual preferences and converts them into constraints for the optimizer                                          |
-| Optimizer     | Python<br>Pyomo<br>IPOPT (Solver)                 | Optimizer will generate optimized shift using information given by the Extractor                                 
+| Optimizer     | Python<br>Pyomo                                   | Optimizer will generate optimized shift using information given by the Extractor                                 
 | LLM Extractor | Python<br>OpenAI API                              | Multiple possible shifts are generated from optimizer. This module evaluates all of them and chooses the best one. |
 
 
