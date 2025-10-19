@@ -67,8 +67,9 @@ EDLoss calculates:
 	3. Cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$
 And gets summation of all of terms calculated above
 
-**EE Loss**
+**EE Loss**  
 ![EELoss](images/EELoss.svg)  
+
 EELoss calculates:
 	1. Element-wise difference between $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$ add all the values and gets mean
 	2. Employee-wise cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$
@@ -80,12 +81,14 @@ Coefficients are fixed as one by default
 
 **Integrated Function**
 ![IntegratedFunction](images/IntegratedFunction.svg)  
+
 - Objective function calculates total loss value of $EDLoss$ and $EELoss$
 - $Z_1$ and $Z_2$ are weights which will be applied to $EDLoss$ and $EELoss$
 	- Coefficients are fixed as one by default
 
 **Objective**
-![ObjectiveFunction](images/ObjectiveFunction.svg)  
+![ObjectiveFunction](images/ObjectiveFunction.svg) 
+
 The objective of this problem is:
 - Find $M_{\text{sugg}, E, D, S}$ and $M_{\text{sugg}, E, E'}$ which minimize the $EDLoss$ and $EELoss$
 - which follows all the pre-set constraints
