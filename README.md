@@ -79,14 +79,16 @@ And gets summation of all of terms calculated above
 $\alpha$, $\beta$, $\gamma$ are weights which will be applied to each element of $EDLoss$ and $EELoss$
 Coefficients are fixed as one by default
 
-**Integrated Function**
+**Integrated Function**  
+
 ![IntegratedFunction](images/IntegratedFunction.svg)  
 
 - Objective function calculates total loss value of $EDLoss$ and $EELoss$
 - $Z_1$ and $Z_2$ are weights which will be applied to $EDLoss$ and $EELoss$
 	- Coefficients are fixed as one by default
 
-**Objective**
+**Objective**  
+
 ![ObjectiveFunction](images/ObjectiveFunction.svg) 
 
 The objective of this problem is:
