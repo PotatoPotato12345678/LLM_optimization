@@ -44,7 +44,8 @@ Used **Python** and **Pyomo** (Python package for solving mathematical optimizat
 - These variables are primary variables
 - Primary variables are used to defining the problem
 ### Supplementary Variables
-![Supplementary Variables](https://latex.codecogs.com/svg.image?$$\begin{aligned}i&&\text{The&space;number&space;of&space;employee}\\[6pt]j&&\text{The&space;number&space;of&space;days&space;in&space;a&space;month}\\[6pt]k&&\text{The&space;number&space;of&space;shifts&space;in&space;a&space;day}\end{aligned}$$)
+![Supplementary Variables](https://latex.codecogs.com/png.latex?%5Cbegin%7Barray%7D%7Clcl%7C%0A%5Ctext%7BEmployee%7D%3A%26E%3D%5C%7Be_1%2Ce_2%2C%5Cldots%2Ce_i%5C%7D%26%5Ctext%7BEmployee%7D%5C%5C%0A%5Ctext%7BDays%7D%3A%26D%3D%5C%7Bd_1%2Cd_2%2C%5Cldots%2Cd_j%5C%7D%26%5Ctext%7BDays%20in%20Month%7D%5C%5C%0A%5Ctext%7BShifts%7D%3A%26S%3D%5C%7Bs_1%2Cs_2%2C%5Cdots%2Cs_k%5C%7D%26%5Ctext%7BShifts%20in%20a%20day%7D%0A%5Cend%7Barray%7D)
+
 - These variables are used to explain **Primary Variables**
 ### Primary Variables (Matrices)
 ![Primary Variables (Matrix)](https://latex.codecogs.com/svg.image?\begin{aligned}\text{Employee-Day&space;Matrix}:\quad&M_{LLM,E,D,S}\in\mathbb{R}^{E\times&space;D\times&space;S}\quad&\text{(LLM&space;output)}\\[6pt]\text{Employee-Employee&space;Matrix}:\quad&M_{LLM,E,D,S}\in\mathbb{R}^{E\times&space;E'}\quad&\text{(LLM&space;output)}\\[6pt]\text{Assignment&space;Matrix}:\quad&A_{E,D,S}\in\mathbb{R}^{E\times&space;D\times&space;S}\quad&\text{Shift&space;assignments}\\[6pt]&\quad\quad\quad\left\{\begin{array}{ll}1&\text{if&space;assigned}\\0&\text{otherwise}\end{array}\right.\quad\text{for}E\times&space;D\times&space;S\\[6pt]\end{aligned})
