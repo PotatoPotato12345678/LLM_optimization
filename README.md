@@ -40,27 +40,27 @@ Used **Python** and **Pyomo** (Python package for solving mathematical optimizat
 - This module is mathematical optimizer to solve optimization problem
 - Implemented mathematical expression and function and solve the problem
 ### Primary Variables
-![PrimaryVariables](PrimaryVariables.svg)
+![PrimaryVariables](images/PrimaryVariables.svg)
 
 - These variables are primary variables
 - Primary variables are used to defining the problem
 ### Supplementary Variables
-![SupplementaryVariables](SupplementaryVariables.svg)  
+![SupplementaryVariables](images/SupplementaryVariables.svg)  
 
 - These variables are used to explain **Primary Variables**
 ### Primary Variables (Matrices)
 ![PrimaryVariables(Matrices)](images/PrimaryVariables(Matrices).svg)
 ### Decision Variables
-![DecisionVariables](DecisionVariables.svg)  
+![DecisionVariables](images/DecisionVariables.svg)  
 - **Decision Variables** are matrices that would be generated as a result
 - These would be the solution of provided problem
 ### Constraints
-![Constraints](Constraints.svg)  
+![Constraints](images/Constraints.svg)  
 - **Constraints** are the rules the optimizer should obey
 - Generated shift should fulfill every constraint
 ### Objective Function
 **ED Loss**
-![EDLoss](EDLoss.svg)  
+![EDLoss](images/EDLoss.svg)  
 EDLoss calculates:
 	1. Element-wise difference between $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$ add all the values and gets mean
 	2. Employee-wise cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$
@@ -68,7 +68,7 @@ EDLoss calculates:
 And gets summation of all of terms calculated above
 
 **EE Loss**
-![EELoss](EELoss.svg)  
+![EELoss](images/EELoss.svg)  
 EELoss calculates:
 	1. Element-wise difference between $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$ add all the values and gets mean
 	2. Employee-wise cosine similarity between  $M_{LLM, E, E'}$ and $M_{sugg, E, E'}$
@@ -79,13 +79,13 @@ $\alpha$, $\beta$, $\gamma$ are weights which will be applied to each element of
 Coefficients are fixed as one by default
 
 **Integrated Function**
-![IntegratedFunction](IntegratedFunction.svg)  
+![IntegratedFunction](images/IntegratedFunction.svg)  
 - Objective function calculates total loss value of $EDLoss$ and $EELoss$
 - $Z_1$ and $Z_2$ are weights which will be applied to $EDLoss$ and $EELoss$
 	- Coefficients are fixed as one by default
 
 **Objective**
-![ObjectiveFunction](ObjectiveFunction.svg)  
+![ObjectiveFunction](images/ObjectiveFunction.svg)  
 The objective of this problem is:
 - Find $M_{\text{sugg}, E, D, S}$ and $M_{\text{sugg}, E, E'}$ which minimize the $EDLoss$ and $EELoss$
 - which follows all the pre-set constraints
