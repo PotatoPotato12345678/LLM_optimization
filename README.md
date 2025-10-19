@@ -10,7 +10,7 @@
 - Automate this job can enhance manager's efficiency and makes the job less expensive.
 
 # Methodology
-![[system_diagram.jpg]]
+![system_diagram.jpg](images/system_diagram.jpg)
 ## Overview
 
 | Module        | Technology stack                                  | Description                                                                                                        |
@@ -127,7 +127,7 @@ The objective of this problem is:
 - The coefficients we applied on our objective function are fixed
 # Future Work
 ## Methodology
-![[system_diagram.jpg]]
+![system_diagram.jpg](images/sysdiagram.jpg)
 - Apply *Simulated Annealing (SA) method* or other metaheuristic method for hyper-parameter tuning
 	- **Hyper-parameter tuning**: finding best coefficients for our model
 	- This will substitute our **Evaluator** module
