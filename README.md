@@ -61,11 +61,9 @@ Used **Python** and **Pyomo** (Python package for solving mathematical optimizat
 **ED Loss**
 ![EDLoss](images/EDLoss.svg)  
 EDLoss calculates:  
-```math
 	1. Element-wise difference between $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$ add all the values and gets mean  
 	2. Employee-wise cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$  
 	3. Cosine similarity between  $M_{LLM, E, D, S}$ and $M_{sugg, E, D, S}$
-```
 And gets summation of all of terms calculated above
 
 **EE Loss**  
