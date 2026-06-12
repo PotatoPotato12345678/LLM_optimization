@@ -6,8 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import ShiftRequirement, ManagerRequirement
-from optimizedShift.models import OptimizedShift
-from backend.LLM_optimizer import shiftOptimizer
+from .orchestrator import run_optimization
 import json
 
 # Create your views here.
@@ -188,19 +187,7 @@ class ShiftManager(LoginRequiredMixin,View):
         if not request.user.is_manager:
             return JsonResponse({'error': 'Only managers can access this endpoint'}, status=403)
         return None
-    
-    def util_get_shift_reqs(self, year, month):
-        shift_reqs = ShiftRequirement.objects.filter(year=year, month=month)
 
-        if not shift_reqs.exists():
-            raise Http404(f"No shift requirements found for year: {year}, month: {month}")
-
-        data = [
-            {"employee": s.employee.username, "content": s.content}
-            for s in shift_reqs
-        ]
-        return data
-    
     def get(self, request):
         invalid_role = self.manager_only(request)
         if invalid_role:
@@ -221,6 +208,14 @@ class ShiftManager(LoginRequiredMixin,View):
             return JsonResponse({"hard_rule": {}, "content": ""}, status=200)
 
     def post(self, request):
+        """Run the optimization pipeline for the given month and return the
+        resulting schedule.
+
+        Pulls every employee's shift requirement, extracts ED/EE willingness via
+        the LLM, solves the Pyomo model (best of several weightings), and stores
+        the result on an ``OptimizedShift`` row (unpublished). Manager settings
+        themselves are saved separately via PUT.
+        """
         invalid_role = self.manager_only(request)
         if invalid_role:
             return invalid_role
@@ -231,27 +226,14 @@ class ShiftManager(LoginRequiredMixin,View):
             return JsonResponse({"error": "year and month are required"}, status=400)
 
         try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
+            result = run_optimization(year, month)
+        except ValueError as exc:
+            return JsonResponse({"error": str(exc)}, status=404)
+        except RuntimeError as exc:
+            # Solver not available / not installed.
+            return JsonResponse({"error": str(exc)}, status=503)
 
-        hard_rule = data.get("hardRule", {})
-        content = data.get("content", "")
-
-        if not isinstance(hard_rule, dict):
-            return JsonResponse({"error": "hardRule must be a JSON object"}, status=400)
-
-        shift, created = ManagerRequirement.objects.get_or_create(
-            manager=request.user,
-            year=year,
-            month=month,
-            defaults={"hard_rule": hard_rule, "content": content}
-        )
-
-        if not created:
-            return JsonResponse({"error": "Shift for this month already exists"}, status=400)
-
-        return JsonResponse({"message": "Manager shift requirement created"}, status=201)
+        return JsonResponse({"data": result}, status=200)
 
     def put(self, request):
         invalid_role = self.manager_only(request)

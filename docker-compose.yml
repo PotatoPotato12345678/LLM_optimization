@@ -3,9 +3,9 @@ services:
     image: postgres:15
     restart: unless-stopped
     environment:
-      POSTGRES_DB: db.postgres
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: ${DB_NAME:-db.postgres}
+      POSTGRES_USER: ${DB_USER:-user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mypassword}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -16,11 +16,15 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DB_NAME=db.postgres
-      - DB_USER=user
-      - DB_PASSWORD=mypassword
-      - DB_HOST=db
-      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-db.postgres}
+      - DB_USER=${DB_USER:-user}
+      - DB_PASSWORD=${DB_PASSWORD:-mypassword}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      # Optional; optimizer runs without a key (neutral willingness) when unset.
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5-mini-2025-08-07}
+      - OPTIMIZER_SOLVER=${OPTIMIZER_SOLVER:-ipopt}
     depends_on:
       - db
 

@@ -155,3 +155,11 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+#------------------------------------------------------#
+# LLM extractor configuration. When OPENAI_API_KEY is unset, the extractor
+# returns neutral willingness and the optimizer runs purely from the hard
+# availability calendar.
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5-mini-2025-08-07")
+#------------------------------------------------------#

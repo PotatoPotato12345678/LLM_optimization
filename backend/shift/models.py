@@ -8,7 +8,7 @@ class ShiftRequirement(models.Model):
         content    : shift requirement text
         author     : ForeignKey to User model
     """
-    content = models.CharField(max_length=150, unique=False)
+    content = models.TextField(blank=True)
     employee = models.ForeignKey(User, on_delete=models.CASCADE)
     year = models.IntegerField(null=False, default=2025)
     month = models.PositiveSmallIntegerField(null=False, default=11)

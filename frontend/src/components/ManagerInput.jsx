@@ -3,7 +3,6 @@ import { Box, Paper, Typography, TextField } from "@mui/material";
 import { useAuth } from "./utils/AuthContext";
 import ShiftSetting from "./utils/ShiftSetting"
 
-let timeoutIdHardRule;
 let timeoutIdContent;
 
 const ManagerInput = () => {
@@ -39,7 +38,8 @@ const ManagerInput = () => {
         );
         if (res.ok) {
           const data = await res.json();
-          if (data.hard_rule) setHardRule(data.hard_rule);
+          // hard_rule is the *structured* rules object owned by <ShiftSetting/>
+          // below; only the free-text notes ("content") are edited here.
           if (data.content) setContent(data.content);
         }
       } catch (err) {
@@ -50,12 +50,12 @@ const ManagerInput = () => {
   }, [nextMonth, nextMonthYear]);
 
   // ✏️ Debounced update handlers
+  // Structured hard rules consumed by the optimizer (workers per shift, business
+  // hours, etc.) are managed by <ShiftSetting/> below, which PUTs them under the
+  // `hardRule` key. This free-text box is a local scratch pad only, so it never
+  // overwrites those structured rules.
   const handleHardRuleChange = (e) => {
-    const value = e.target.value;
-    setHardRule(value);
-
-    if (timeoutIdHardRule) clearTimeout(timeoutIdHardRule);
-    timeoutIdHardRule = setTimeout(() => updateField("hard_rule", value), 600);
+    setHardRule(e.target.value);
   };
 
   const handleContentChange = (e) => {
