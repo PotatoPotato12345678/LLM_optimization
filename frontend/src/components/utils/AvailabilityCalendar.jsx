@@ -3,6 +3,15 @@ import { Box, Button, Typography, Paper } from "@mui/material";
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+// Local YYYY-MM-DD key. Using toISOString() here would shift the date back a
+// day in timezones behind UTC (e.g. JST), misaligning the stored calendar.
+const localDateKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
 const generateDates = (month, year) => {
   const dates = [];
   const numDays = new Date(year, month + 1, 0).getDate();
@@ -22,7 +31,7 @@ const AvailabilityCalendar = () => {
   useEffect(() => {
     const init = {};
     dates.forEach((date) => {
-      const key = date.toISOString().slice(0, 10);
+      const key = localDateKey(date);
       init[key] = { morning: "X", evening: "X" };
     });
     console.log(init)
@@ -78,7 +87,7 @@ const AvailabilityCalendar = () => {
     // Collect all keys for this weekday
     const weekdayKeys = dates
       .filter((date) => date.getDay() === weekdayIndex)
-      .map((date) => date.toISOString().slice(0, 10));
+      .map((date) => localDateKey(date));
 
     // Check if all are identical
     const firstKey = weekdayKeys[0];
@@ -146,7 +155,7 @@ const AvailabilityCalendar = () => {
           {emptySlots.map((i) => <Box key={`empty-${i}`} />)}
 
           {dates.map((date) => {
-            const key = date.toISOString().slice(0, 10);
+            const key = localDateKey(date);
             return (
               <Paper key={key} sx={{ p: 1, textAlign: "center" }}>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>{date.getDate()}</Typography>

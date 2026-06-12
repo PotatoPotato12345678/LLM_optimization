@@ -19,8 +19,11 @@ class User(View):
         minimum functionality only
         Registration and deletion are done by the system admin
     """
-    @method_decorator(login_required(login_url=None))
     def get(self, request):
+        # Return a clean 401 for unauthenticated callers instead of redirecting
+        # to LOGIN_URL (which 404s and is just noise for the SPA's auth check).
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
         return JsonResponse({
             "username": request.user.username,
             "is_manager": request.user.is_manager
@@ -44,8 +47,9 @@ class User(View):
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=500)
 
-    @method_decorator(login_required(login_url=None))
     def delete(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
         try:
             logout(request)
             return JsonResponse({'message': 'Logout successful'}, status=200)

@@ -18,7 +18,7 @@ def _solver_available():
     solve are skipped otherwise so the suite is green without a solver)."""
     try:
         import pyomo.environ as pyo
-        opt = pyo.SolverFactory(os.getenv("OPTIMIZER_SOLVER", "ipopt"))
+        opt = pyo.SolverFactory(os.getenv("OPTIMIZER_SOLVER", "cbc"))
         return opt is not None and opt.available(exception_flag=False)
     except Exception:
         return False

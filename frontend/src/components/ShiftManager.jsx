@@ -3,6 +3,15 @@ import { Box, Button, Typography, TextField, Paper } from "@mui/material";
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+// Local YYYY-MM-DD key (toISOString would shift the date back a day in
+// timezones behind UTC, e.g. JST).
+const localDateKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
 const generateDates = (month, year) => {
   const dates = [];
   const numDays = new Date(year, month + 1, 0).getDate();
@@ -71,7 +80,7 @@ const ShiftManager = () => {
       // Initialize blank calendar if no data
       const init = {};
       dates.forEach((d) => {
-        const key = d.toISOString().slice(0, 10);
+        const key = localDateKey(d);
         init[key] = { morning: "X", evening: "X" };
       });
       setAvailability(init);
@@ -162,7 +171,7 @@ const ShiftManager = () => {
             ))}
 
             {dates.map((date) => {
-                const key = date.toISOString().slice(0, 10);
+                const key = localDateKey(date);
                 return (
                 <Paper key={key} sx={{ p: 1, textAlign: "center" }}>
                     <Typography variant="subtitle2" sx={{ mb: 1 }}>

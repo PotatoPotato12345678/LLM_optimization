@@ -12,10 +12,10 @@ import {
 
 const debugUsers = [
   { label: "マネージャー", username: "manager_1", password: "m_1" },
-  { label: "レオ", username: "Leo", password: "e_1" },
-  { label: "タム", username: "Tam", password: "e_2" },
-  { label: "キム", username: "Kim", password: "e_3" },
-  { label: "とうま", username: "Toma", password: "e_4" },
+  { label: "従業員1", username: "employee_1", password: "e_1" },
+  { label: "従業員2", username: "employee_2", password: "e_2" },
+  { label: "従業員3", username: "employee_3", password: "e_3" },
+  { label: "従業員4", username: "employee_4", password: "e_4" },
 ];
 
 const Login = () => {

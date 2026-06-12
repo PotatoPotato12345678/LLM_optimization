@@ -1,9 +1,8 @@
-"""Callable solver entry point for the shift-scheduling model.
+"""Callable solver entry point for the shift-scheduling MILP.
 
-Refactored from the former standalone ``optimizer/solver.py``: instead of reading
-``data.json`` from disk and printing to stdout, :func:`solve` takes the problem
-data as arguments and returns a structured result dict that the Django
-orchestrator can persist on an ``OptimizedShift`` row.
+Takes the problem data as arguments and returns a structured result dict that the
+Django orchestrator persists on an ``OptimizedShift`` row. The model is a MILP, so
+CBC returns an exact 0/1 schedule that satisfies every constraint (no rounding).
 """
 
 import os
@@ -13,10 +12,8 @@ import pyomo.environ as pyo
 
 from .model import build_model
 
-# Default solver. ``ipopt`` solves the (continuous relaxation of the) nonlinear
-# objective; the binary assignment variables are rounded afterwards. Override
-# with the OPTIMIZER_SOLVER env var (e.g. "bonmin" for a true MINLP solve).
-DEFAULT_SOLVER = os.getenv("OPTIMIZER_SOLVER", "ipopt")
+# Default solver: CBC (mixed-integer linear). Override with OPTIMIZER_SOLVER.
+DEFAULT_SOLVER = os.getenv("OPTIMIZER_SOLVER", "cbc")
 
 
 def _week_index(dates):
@@ -40,13 +37,10 @@ def solve(
     shifts,
     availability,
     ed,
-    ee,
     *,
     workers_per_shift=2,
     time_open=9,
     time_close=17,
-    z1=1.0,
-    z2=1.0,
     solver=None,
     tee=False,
 ):
@@ -58,16 +52,15 @@ def solve(
         shifts: list of shift labels, e.g. ``["morning", "evening"]`` (``S``).
         availability: dict ``{(emp, date, shift): 0|1}`` — hard availability.
         ed: dict ``{(emp, date, shift): willingness}`` — sparse, default 0.
-        ee: dict ``{(emp, other_emp): synergy}`` — sparse, default 0.
         workers_per_shift: required number of workers per shift.
         time_open/time_close: business hours (drive per-shift hour length).
-        z1/z2: objective weights on the ED / EE loss terms.
-        solver: solver name; falls back to ``OPTIMIZER_SOLVER`` / ipopt.
+        solver: solver name; falls back to ``OPTIMIZER_SOLVER`` / cbc.
         tee: stream solver logs to stdout when True.
 
     Returns:
         dict with keys ``assignments`` (list of {employee, date, shift}),
-        ``objective`` (float), ``status`` (solver termination), ``solver``.
+        ``objective`` (total willingness of the chosen assignments, higher is
+        better), ``status`` (solver termination), ``solver``.
 
     Raises:
         RuntimeError: if the configured solver is not available.
@@ -94,28 +87,26 @@ def solve(
         "time_open": {None: time_open},
         "time_close": {None: time_close},
         "week_of": dict(week_of),
-        "Z1": {None: z1},
-        "Z2": {None: z2},
         "M_AVAIL": {k: v for k, v in availability.items() if v},
         "M_LLM_ED": {k: v for k, v in ed.items() if v},
-        "M_LLM_EE": {k: v for k, v in ee.items() if v},
     }}
 
     model = build_model()
     instance = model.create_instance(pyomo_data)
     results = opt.solve(instance, tee=tee)
-
     status = str(results.solver.termination_condition)
 
-    # Round the (possibly relaxed) binary assignment variables.
+    # CBC returns exact 0/1 values; threshold guards against tiny numeric noise.
     assignments = []
     for (e, d, s), var in instance.A.items():
-        if pyo.value(var) > 0.5:
+        val = pyo.value(var, exception=False)
+        if val is not None and val > 0.5:
             assignments.append({"employee": e, "date": d, "shift": s})
     assignments.sort(key=lambda a: (a["date"], a["shift"], a["employee"]))
 
     try:
-        objective = float(pyo.value(instance.minimize_oss))
+        # Report the maximized total willingness (higher = better).
+        objective = -float(pyo.value(instance.total_willingness))
     except Exception:
         objective = None
 

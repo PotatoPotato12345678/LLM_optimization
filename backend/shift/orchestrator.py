@@ -15,7 +15,7 @@ import logging
 
 from .models import ShiftRequirement, ManagerRequirement
 from .evaluator import evaluate
-from llm_extractor import extract_ed, extract_ee
+from llm_extractor import extract_ed
 from optimizedShift.models import OptimizedShift
 
 logger = logging.getLogger(__name__)
@@ -70,14 +70,11 @@ def run_optimization(year, month):
 
     # LLM extraction (offline-safe: returns neutral when no API key configured).
     ed = {}
-    ee = {}
     for req in requirements:
         username = req.employee.username
         text = req.content or ""
         for (d, s), willingness in extract_ed(text, year, month, dates, SHIFTS).items():
             ed[(username, d, s)] = willingness
-        for other, score in extract_ee(text, employees, username).items():
-            ee[(username, other)] = score
 
     # Manager hard rules (workers per shift, business hours) for this month.
     manager_req = ManagerRequirement.objects.filter(year=year, month=month).first()
@@ -87,7 +84,7 @@ def run_optimization(year, month):
     time_close = int(hard_rule.get("time_close", 17))
 
     result = evaluate(
-        employees, dates, SHIFTS, availability, ed, ee,
+        employees, dates, SHIFTS, availability, ed,
         workers_per_shift=workers_per_shift,
         time_open=time_open,
         time_close=time_close,

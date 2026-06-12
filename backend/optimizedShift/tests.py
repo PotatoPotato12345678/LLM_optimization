@@ -41,8 +41,11 @@ class OptimizedShiftTests(TestCase):
         self.opt.refresh_from_db()
         self.assertTrue(self.opt.publish_status)
 
-    def test_employee_get_filtered_shift(self):
+    def test_employee_get_optimized_shift(self):
+        # Employees fetch the full schedule plus its publish flag; the frontend
+        # gates display on publish_status (shows the whole rota when published).
         self.login_as(self.employee)
         response = self.client.get(f"{self.employee_url}?year=2025&month=11")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['data'], [{'employee': 'employee', 'content': 'Mon-Fri 9-5'}])
+        self.assertEqual(response.json()['data'], self.opt.shift)
+        self.assertEqual(response.json()['publish_status'], False)

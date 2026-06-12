@@ -24,7 +24,7 @@ services:
       # Optional; optimizer runs without a key (neutral willingness) when unset.
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5-mini-2025-08-07}
-      - OPTIMIZER_SOLVER=${OPTIMIZER_SOLVER:-ipopt}
+      - OPTIMIZER_SOLVER=${OPTIMIZER_SOLVER:-cbc}
     depends_on:
       - db
 
